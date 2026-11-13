@@ -164,7 +164,6 @@ footer .wrap{border-top:1px solid var(--line);padding-top:22px}
     <span class="btns"><a class="btn" aria-disabled="true">Paper soon</a><a class="btn" aria-disabled="true">Code soon</a><a class="btn" aria-disabled="true">HOT3D-Grasp soon</a></span>
   </div>
   <div class="hero" id="video"><video src="static/videos/graze_supp.mp4" poster="static/images/poster.jpg" controls playsinline preload="metadata"></video></div>
-  <div class="dl"><a id="dlvid" href="static/videos/graze_supp.mp4" download="GRAZE_video.mp4">↓ Download video (MP4, 14 MB)</a><span id="dlnote">Supplementary video with narration cards, 1080p.</span></div>
 </header>
 
 <main>
@@ -320,25 +319,6 @@ CLIPS.forEach((c,i)=>{ const b=document.createElement("button"); b.className="ta
 let start = 0; try{ start = +(localStorage.getItem("graze-tab")||0); }catch(e){}
 show(Math.min(Math.max(start,0), CLIPS.length-1));
 
-// Inside the claude.ai viewer a plain download link is inert; route the click through the downloads capability there.
-// On a normal web host (no window.claude) the link downloads directly.
-(async () => {
-  if (!window.claude || !window.claude.use) return;
-  const downloads = await window.claude.use("downloads").catch(() => null);
-  if (!downloads) return;
-  const a = document.getElementById("dlvid"), note = document.getElementById("dlnote");
-  a.addEventListener("click", async (e) => {
-    e.preventDefault();
-    try {
-      note.textContent = "Preparing the file…";
-      const blob = await (await fetch(a.getAttribute("href"))).blob();
-      await downloads.save({filename: "GRAZE_video.mp4", data: blob});
-      note.textContent = "Saved.";
-    } catch (err) {
-      note.textContent = err && err.code === "declined" ? "Download cancelled." : "Download is not available in this view.";
-    }
-  });
-})();
 </script>
 </body>
 </html>
