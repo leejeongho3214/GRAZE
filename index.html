@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GRAZE</title>
+<meta name="description" content="GRAZE synthesizes grasp-and-lift hand–object motion on unseen objects from where a person looks, with no text prompt.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=EB+Garamond:ital,wght@1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f6f5f0; --surface:#ffffff; --sunk:#eeede6; --ink:#161a18; --muted:#5d6560; --faint:#8b938e; --line:#dcdcd3;
+  --gaze:#14894a; --gaze-soft:#ddf1e4; --ours:#2f5fd0; --ours-soft:#e3eafb; --text:#b9362c; --text-soft:#f9e5e2;
+  --stage:#101413; --stage-ink:#eef2ef;
+  --f:"Inter Tight",system-ui,-apple-system,"Segoe UI",sans-serif; --s:"EB Garamond",Georgia,serif; --m:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1211; --surface:#171b19; --sunk:#131715; --ink:#e8ede9; --muted:#9ba5a0; --faint:#6f7873; --line:#2a312e;
+  --gaze:#4bd486; --gaze-soft:#14301f; --ours:#82a6ff; --ours-soft:#1a2542; --text:#f0897d; --text-soft:#38201d;
+  --stage:#080a09; --stage-ink:#eef2ef; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1211; --surface:#171b19; --sunk:#131715; --ink:#e8ede9; --muted:#9ba5a0; --faint:#6f7873; --line:#2a312e;
+  --gaze:#4bd486; --gaze-soft:#14301f; --ours:#82a6ff; --ours-soft:#1a2542; --text:#f0897d; --text-soft:#38201d;
+  --stage:#080a09; --stage-ink:#eef2ef; color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:17.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--ours)}
+em.s{font-family:var(--s);font-style:italic;font-weight:400;letter-spacing:0}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:max(20px,env(safe-area-inset-left,0px))}
+.narrow{max-width:760px}
+
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:22px;align-items:center;height:54px;overflow-x:auto;white-space:nowrap}
+nav b{font-weight:700;letter-spacing:.06em;margin-right:auto;font-size:15px}
+nav b i{color:var(--gaze);font-style:normal}
+nav a{color:var(--muted);text-decoration:none;font-size:14.5px}
+nav a:hover{color:var(--ink)}
+
+/* hero */
+header{padding-block:72px 0}
+.kicker{font-family:var(--m);font-size:12.5px;letter-spacing:.14em;color:var(--gaze);text-transform:uppercase;display:flex;gap:10px;align-items:center}
+.kicker::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--gaze);box-shadow:0 0 0 5px var(--gaze-soft)}
+h1{font-weight:500;font-size:clamp(46px,8.4vw,104px);line-height:.98;letter-spacing:-.035em;margin:.28em 0 .22em;text-wrap:balance}
+h1 em.s{color:var(--gaze);font-size:1.06em}
+.sub{font-size:clamp(19px,2.3vw,24px);line-height:1.45;color:var(--muted);margin:0;max-width:720px;text-wrap:pretty}
+.sub b{color:var(--ink);font-weight:600}
+.byline{display:flex;flex-wrap:wrap;gap:10px 26px;align-items:center;margin-top:28px;font-size:15px;color:var(--muted)}
+.byline .title{color:var(--ink);font-weight:600}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;padding:8px 15px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--faint);text-decoration:none;font-weight:500;font-size:14px}
+.hero{margin-top:40px;border-radius:18px;overflow:hidden;background:var(--stage);aspect-ratio:16/9;box-shadow:0 30px 60px -30px rgba(0,0,0,.35)}
+.hero video{width:100%;height:100%;display:block}
+
+/* sections */
+section{padding-block:96px 0}
+.eyebrow{font-family:var(--m);font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:14px}
+h2{font-weight:500;font-size:clamp(32px,4.4vw,50px);line-height:1.05;letter-spacing:-.025em;margin:0 0 18px;text-wrap:balance;max-width:880px}
+h2 em.s{color:var(--gaze)}
+.lead{font-size:clamp(18px,1.9vw,21px);line-height:1.5;color:var(--muted);margin:0 0 30px;max-width:760px;text-wrap:pretty}
+.lead b{color:var(--ink);font-weight:600}
+p{max-width:760px}
+figure{margin:0}
+figure img{width:100%;height:auto;display:block;border-radius:14px;border:1px solid var(--line);background:#fff}
+figcaption{color:var(--muted);font-size:15px;line-height:1.5;margin-top:12px;max-width:860px}
+
+/* three questions */
+.qs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:8px 0 30px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px 22px 20px;min-width:0}
+.q .say{font-family:var(--s);font-style:italic;font-size:25px;line-height:1.2;color:var(--text);margin-bottom:10px}
+.q h3{font-size:18px;font-weight:600;margin:0 0 6px}
+.q p{margin:0;color:var(--muted);font-size:15.5px}
+
+/* idea band */
+.band{background:var(--stage);color:var(--stage-ink);border-radius:22px;padding:clamp(28px,5vw,56px);display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(24px,4vw,48px);align-items:center}
+.band h2{color:var(--stage-ink)}
+.band h2 em.s{color:#5fe39b}
+.band p{color:#a9b4ae;margin:0 0 16px}
+.band .io{display:grid;gap:10px;margin-top:20px;font-size:15px}
+.band .io div{display:flex;gap:12px;align-items:baseline}
+.band .io span{font-family:var(--m);font-size:12px;letter-spacing:.1em;color:#5fe39b;min-width:58px}
+.band .vid{border-radius:14px;overflow:hidden;background:#000;min-width:0}
+.band video{width:100%;display:block}
+
+/* method */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:22px}
+.step{border-top:2px solid var(--ink);padding-top:14px;min-width:0}
+.step .n{font-family:var(--m);font-size:12.5px;color:var(--gaze);letter-spacing:.08em}
+.step h3{margin:.25em 0 .3em;font-size:20px;font-weight:600;letter-spacing:-.01em}
+.step p{margin:0;color:var(--muted);font-size:15.5px}
+
+/* results */
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:0 0 34px}
+.stat{min-width:0}
+.stat b{display:block;font-weight:500;font-size:clamp(46px,6vw,68px);line-height:1;letter-spacing:-.04em;color:var(--ours);font-variant-numeric:tabular-nums}
+.stat .vs{font-family:var(--m);font-size:13px;color:var(--faint);margin:8px 0 4px}
+.stat span{color:var(--muted);font-size:15.5px;display:block;max-width:300px}
+.viewer{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tab{border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:7px 14px;border-radius:999px;font:500 14px var(--f);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.player{border-radius:12px;overflow:hidden;background:#fff}
+.player video{width:100%;display:block}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;font-size:14px}
+.pill{padding:4px 11px;border-radius:999px}
+.pill.t{background:var(--text-soft);color:var(--text)}
+.pill.g{background:var(--gaze-soft);color:var(--gaze)}
+.tablewrap{overflow-x:auto;margin-top:34px}
+table{border-collapse:collapse;width:100%;min-width:600px;font-variant-numeric:tabular-nums;font-size:15.5px}
+th,td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:right}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--faint);font-weight:500;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;font-family:var(--m)}
+td small{color:var(--faint);font-size:13px}
+tr.ours td{font-weight:650;color:var(--ours);background:var(--ours-soft)}
+.note{color:var(--faint);font-size:14px;margin-top:10px}
+
+/* together */
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;min-width:0}
+.card .lbl{font-family:var(--m);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.card h3{margin:.35em 0 .5em;font-size:20px;font-weight:600}
+.bar{display:grid;grid-template-columns:minmax(0,92px) minmax(0,1fr) 54px;gap:10px;align-items:center;font-size:14.5px;margin-top:8px}
+.bar .tr{height:12px;border-radius:6px;background:var(--sunk);overflow:hidden}
+.bar .fill{height:100%;border-radius:6px}
+.bar .v{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.card p{color:var(--muted);font-size:15px;margin:14px 0 0}
+
+/* failure */
+.fail{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(20px,3vw,36px);align-items:center;margin-bottom:34px}
+.fail .vid{border-radius:14px;overflow:hidden;background:var(--stage);min-width:0}
+.fail video{width:100%;display:block}
+.fail h3{font-size:24px;font-weight:600;letter-spacing:-.01em;margin:0 0 10px}
+.fail p{color:var(--muted);margin:0 0 12px}
+.fgrid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);gap:16px;align-items:start}
+
+.defs{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px 18px;margin:22px 0 0;padding:18px 20px;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.defs div{min-width:0}
+.defs dt{font-weight:600;font-size:15px;display:flex;gap:8px;align-items:center}
+.defs dt i{width:11px;height:11px;border-radius:3px;flex:none}
+.defs dd{margin:4px 0 0;color:var(--muted);font-size:14px;line-height:1.45}
+.dl{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px;font-size:14.5px;color:var(--muted)}
+.dl a{display:inline-flex;gap:8px;align-items:center;padding:8px 15px;border-radius:999px;background:var(--ink);color:var(--bg);text-decoration:none;font-weight:600}
+.limits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.limits div{border-top:1px solid var(--line);padding-top:12px;color:var(--muted);font-size:15.5px;min-width:0}
+.limits b{display:block;color:var(--ink);font-weight:600;margin-bottom:4px}
+
+footer{padding-block:96px 64px;color:var(--faint);font-size:14px}
+footer .wrap{border-top:1px solid var(--line);padding-top:22px}
+
+@media (max-width:860px){.band,.fail,.fgrid{grid-template-columns:1fr}}
+@media (max-width:760px){.qs,.steps,.stats,.pair,.limits{grid-template-columns:1fr} section{padding-block:72px 0}}
+</style>
+</head>
+<body>
+<nav><div class="wrap"><b>GR<i>A</i>ZE</b><a href="#why">Why gaze</a><a href="#method">Method</a><a href="#results">Results</a><a href="#steer">Steering</a><a href="#failures">Failures</a></div></nav>
+
+<header class="wrap">
+  <div class="kicker">GRAZE · Grasp from Gaze</div>
+  <h1>Look at it.<br><em class="s">The hand grasps it.</em></h1>
+  <p class="sub">GRAZE turns <b>where a person looks</b> into a full grasp-and-lift motion of the hands and the object. It needs no text prompt and works on objects it has never seen.</p>
+  <div class="byline">
+    <span class="title">Text-Free Grasp Synthesis for Unseen Objects from Human Gaze</span>
+    <span class="btns"><a class="btn" aria-disabled="true">Paper soon</a><a class="btn" aria-disabled="true">Code soon</a><a class="btn" aria-disabled="true">HOT3D-Grasp soon</a></span>
+  </div>
+  <div class="hero" id="video"><video src="static/videos/graze_supp.mp4" poster="static/images/poster.jpg" controls playsinline preload="metadata"></video></div>
+  <div class="dl"><a id="dlvid" href="static/videos/graze_supp.mp4" download="GRAZE_video.mp4">↓ Download video (MP4, 14 MB)</a><span id="dlnote">Supplementary video with narration cards, 1080p.</span></div>
+</header>
+
+<main>
+<section id="why" class="wrap">
+  <div class="eyebrow">01 — Why not just say it?</div>
+  <h2>Words are a clumsy way to point <em class="s">at a place</em> on an object.</h2>
+  <p class="lead">Text-conditioned models must be told which object, which part and which side. Each of these is hard to say, and the models often do not listen.</p>
+  <div class="qs">
+    <div class="q"><div class="say">“Which mug?”</div><h3>Names do not pick an instance</h3><p>Asked for the blue patterned mug, a text model takes the white mug next to it.</p></div>
+    <div class="q"><div class="say">“Which part?”</div><h3>Parts need object-specific words</h3><p>Asked for the spatula's handle, a text model grasps the blade.</p></div>
+    <div class="q"><div class="say">“Which side?”</div><h3>“Left” has no reference frame</h3><p>Prompted with “left” or “right”, a text model grasps the same end of the dumbbell.</p></div>
+  </div>
+  <figure><img src="static/images/concept.jpg" alt="Four cases where text prompts fail and GRAZE, given gaze, succeeds" loading="lazy">
+    <figcaption>Text baseline vs. GRAZE on unseen objects: (a) instance, (b) side, (c) part, (d) rotating the requested approach.</figcaption></figure>
+</section>
+
+<section class="wrap">
+  <div class="band">
+    <div>
+      <div class="eyebrow" style="color:#7f8c85">02 — The idea</div>
+      <h2>The eyes get there <em class="s">first.</em></h2>
+      <p>Before the hand moves, people look at what they are about to grasp. Smart glasses already record this gaze. GRAZE uses it as the only instruction.</p>
+      <div class="io">
+        <div><span>INPUT</span>Object shape and start pose, plus the gaze rays of the first 30% of the clip</div>
+        <div><span>OUTPUT</span>The whole motion: both hands reach, grasp and lift the object</div>
+      </div>
+    </div>
+    <div class="vid"><video src="static/videos/task.mp4" autoplay muted loop playsinline preload="metadata"></video></div>
+  </div>
+</section>
+
+<section id="method" class="wrap">
+  <div class="eyebrow">03 — Method</div>
+  <h2>Gaze becomes a field <em class="s">on the object surface.</em></h2>
+  <p class="lead">A gaze ray is just a line in space. GRAZE turns it into something a hand can use: a map of where on the object the person was looking, and from which direction.</p>
+  <figure><img src="static/images/overview.jpg" alt="GRAZE overview: GeoGaze encoding, diffusion Transformer with gaze cross-attention, and inference with MANO fitting and contact refinement" loading="lazy"></figure>
+  <div class="steps">
+    <div class="step"><div class="n">01 · GEOGAZE</div><h3>Rays → surface cues</h3><p>For every point around the object: how close it is to a gaze ray, and how well it faces the viewer.</p></div>
+    <div class="step"><div class="n">02 · DIFFUSION</div><h3>Hands attend to gaze</h3><p>A diffusion Transformer generates hand and object motion; the hand tokens attend to the gaze cues.</p></div>
+    <div class="step"><div class="n">03 · INFERENCE</div><h3>Fit, then settle contact</h3><p>MANO hands are fitted to the predicted vertices, and predicted hand-to-object offsets guide a short contact refinement.</p></div>
+  </div>
+</section>
+
+<section id="results" class="wrap">
+  <div class="eyebrow">04 — Results on unseen objects</div>
+  <h2>No text, and still <em class="s">the right part.</em></h2>
+  <p class="lead">Every test object is held out from training. The baselines are told the part in words; GRAZE only sees the gaze.</p>
+  <div class="stats">
+    <div class="stat"><b>66.3%</b><div class="vs">best text model 46.6%</div><span>grasps that hold and lift the object</span></div>
+    <div class="stat"><b>49.3%</b><div class="vs">best text model 43.6%</div><span>grasps on the intended part, without being told the part</span></div>
+    <div class="stat"><b>74.5%</b><div class="vs">best text model 44.0%</div><span>grasps that keep the object in place in a physics simulation</span></div>
+  </div>
+  <div class="viewer">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="player"><video id="cmp" muted loop playsinline autoplay preload="metadata"></video></div>
+    <div class="meta" id="cmpmeta"></div>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Method</th><th>Input</th><th>Grasp success</th><th>Part Acc.</th><th>Part contact</th><th>Sim. stable</th></tr></thead>
+      <tbody>
+        <tr><td>Text2HOI <small>CVPR '24</small></td><td>text</td><td>35.3</td><td>36.8</td><td>36.6</td><td>44.0</td></tr>
+        <tr><td>DiffH2O <small>SIGGRAPH Asia '24</small></td><td>text</td><td>17.9</td><td>31.7</td><td>31.0</td><td>27.8</td></tr>
+        <tr><td>LatentHOI <small>CVPR '25</small></td><td>text</td><td>46.6</td><td>43.6</td><td>42.5</td><td>40.7</td></tr>
+        <tr><td>OpenHOI <small>NeurIPS '25</small></td><td>text</td><td>25.8</td><td>31.5</td><td>31.0</td><td>31.7</td></tr>
+        <tr class="ours"><td>GRAZE</td><td>gaze</td><td>66.3</td><td>49.3</td><td>50.1</td><td>74.5</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">HOT3D-Grasp, three object-disjoint folds, ten samples per clip (%). Each baseline runs its released pipeline. On the separate GazeHOI dataset, without fine-tuning, GRAZE reaches 45.3% grasp success against 33.8% for the best baseline (939 clips).</p>
+</section>
+
+<section id="steer" class="wrap">
+  <div class="eyebrow">05 — Steering</div>
+  <h2>Move the gaze, <em class="s">the hand follows.</em></h2>
+  <p class="lead">We rotate the recorded gaze around the object. The approach of GRAZE turns with it in <b>59%</b> of cases. A text model retrained with clock words (“from 3 o'clock”) follows a changed word in only <b>21%</b>.</p>
+  <div class="player" style="border:1px solid var(--line)"><video src="static/videos/steer.mp4" autoplay muted loop playsinline preload="metadata"></video></div>
+</section>
+
+<section id="together" class="wrap">
+  <div class="eyebrow">06 — Gaze and text</div>
+  <h2>When a prompt exists, <em class="s">use both.</em></h2>
+  <p class="lead">Gaze and words carry different information. Giving GRAZE both helps each side.</p>
+  <div class="pair">
+    <div class="card"><div class="lbl">Add gaze to a prompt</div><h3>The approach side appears</h3>
+      <div class="bar"><span>text only</span><div class="tr"><div class="fill" style="width:2.2%;background:var(--text)"></div></div><span class="v">2.2</span></div>
+      <div class="bar"><span>text + gaze</span><div class="tr"><div class="fill" style="width:57.4%;background:var(--ours)"></div></div><span class="v">57.4</span></div>
+      <p>Inputs whose approach turns with the rotated input (%): a changed clock word for text only, a rotated gaze for text + gaze. Words alone almost never move the side.</p></div>
+    <div class="card"><div class="lbl">Add a prompt to gaze</div><h3>Part contact gets sharper</h3>
+      <div class="bar"><span>gaze only</span><div class="tr"><div class="fill" style="width:50.1%;background:var(--gaze)"></div></div><span class="v">50.1</span></div>
+      <div class="bar"><span>gaze + text</span><div class="tr"><div class="fill" style="width:52.3%;background:var(--ours)"></div></div><span class="v">52.3</span></div>
+      <p>Share of contact on the target part (%). The pair gives the best part grounding of all methods.</p></div>
+  </div>
+</section>
+
+<section id="failures" class="wrap">
+  <div class="eyebrow">07 — Where it fails</div>
+  <h2>Gaze is a hint, <em class="s">not a command.</em></h2>
+  <p class="lead">GRAZE does what the eyes suggest. When people look at one part and then grasp another, GRAZE grasps the part they looked at.</p>
+  <div class="fail">
+    <div class="vid"><video src="static/videos/failure.mp4" autoplay muted loop playsinline preload="metadata"></video></div>
+    <div>
+      <h3>Looking at the head, grasping the handle</h3>
+      <p>The person watches the head of the potato masher, then takes it by the handle. GRAZE, which only sees the gaze, grasps the head.</p>
+      <p>The same pattern appears on the bottle cap, the mug body, the dumbbell head and the vase rim below.</p>
+    </div>
+  </div>
+  <div class="fgrid">
+    <figure><img src="static/images/gaze_failures.jpg" alt="Four wrong-part grasps of GRAZE where the person looked at a different part than the one grasped" loading="lazy">
+      <figcaption>Wrong-part grasps: the gaze GRAZE receives, the recorded grasp, and the output of GRAZE.</figcaption></figure>
+    <figure><img src="static/images/failure_modes.jpg" alt="Outcome breakdown for all methods and for GRAZE's hardest objects" loading="lazy">
+      <figcaption>Outcome of every sample. GRAZE almost never misses the object; its errors are mostly contacts on another part. Panel (b) shows its hardest objects.</figcaption></figure>
+  </div>
+  <dl class="defs">
+    <div><dt><i style="background:#2e8b57"></i>Target-part success</dt><dd>Touches the target part in each of the final five frames, with at most 1 cm penetration.</dd></div>
+    <div><dt><i style="background:#b8bcc0"></i>No contact</dt><dd>The hand never touches the object at all.</dd></div>
+    <div><dt><i style="background:#7d8590"></i>Contact lost</dt><dd>The hand touches the object, but lets go or slips before the end: contact is missing in some of the final five frames.</dd></div>
+    <div><dt><i style="background:#e8a200"></i>Wrong part</dt><dd>Holds the object at the end, but mostly on another part.</dd></div>
+    <div><dt><i style="background:#c0392b"></i>Penetration</dt><dd>Holds the target part, but the hand enters the object by more than 1 cm.</dd></div>
+  </div>
+</section>
+
+<section id="limits" class="wrap">
+  <div class="eyebrow">08 — Limitations</div>
+  <div class="limits">
+    <div><b>Gaze ≠ intent</b>Early gaze does not always rest on the part that is grasped; a prompt can complement it.</div>
+    <div><b>Grasp and lift only</b>Gaze alone cannot express actions such as pouring or handing over.</div>
+    <div><b>Recorded gaze</b>We evaluate on gaze recorded in HOT3D, not on a live user in the loop.</div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">Built on the <a href="https://facebookresearch.github.io/hot3d/" rel="noopener">HOT3D</a> dataset.</div></footer>
+
+<script>
+const CLIPS = [
+  {key:"obj0_61", name:"Spatula", prompt:"Grab handle of spatula_red with right hand."},
+  {key:"obj2_109", name:"White mug", prompt:"Grab handle of mug_white with right hand."},
+  {key:"obj1_50", name:"Potato masher", prompt:"Grab handle of potato_masher with right hand."},
+  {key:"obj1_123", name:"Milk carton", prompt:"Grab top of carton_milk with right hand."},
+  {key:"obj2_12", name:"Ranch bottle", prompt:"Grab cap of bottle_ranch with right hand."},
+  {key:"obj0_105", name:"Coffee pot", prompt:"Grab handle of coffee_pot with left hand."}
+];
+const tabs = document.getElementById("tabs"), vid = document.getElementById("cmp"), meta = document.getElementById("cmpmeta");
+function show(i){
+  const c = CLIPS[i];
+  [...tabs.children].forEach((b,j)=>b.setAttribute("aria-selected", j===i));
+  vid.src = `static/videos/results_${c.key}.mp4`; vid.play().catch(()=>{});
+  meta.innerHTML = `<span class="pill t">Baselines are told: “${c.prompt}”</span><span class="pill g">GRAZE: gaze only, no text</span>`;
+  try{ localStorage.setItem("graze-tab", i); }catch(e){}
+}
+CLIPS.forEach((c,i)=>{ const b=document.createElement("button"); b.className="tab"; b.role="tab"; b.textContent=c.name; b.onclick=()=>show(i); tabs.appendChild(b); });
+let start = 0; try{ start = +(localStorage.getItem("graze-tab")||0); }catch(e){}
+show(Math.min(Math.max(start,0), CLIPS.length-1));
+
+// Inside the claude.ai viewer a plain download link is inert; route the click through the downloads capability there.
+// On a normal web host (no window.claude) the link downloads directly.
+(async () => {
+  if (!window.claude || !window.claude.use) return;
+  const downloads = await window.claude.use("downloads").catch(() => null);
+  if (!downloads) return;
+  const a = document.getElementById("dlvid"), note = document.getElementById("dlnote");
+  a.addEventListener("click", async (e) => {
+    e.preventDefault();
+    try {
+      note.textContent = "Preparing the file…";
+      const blob = await (await fetch(a.getAttribute("href"))).blob();
+      await downloads.save({filename: "GRAZE_video.mp4", data: blob});
+      note.textContent = "Saved.";
+    } catch (err) {
+      note.textContent = err && err.code === "declined" ? "Download cancelled." : "Download is not available in this view.";
+    }
+  });
+})();
+</script>
+</body>
+</html>
