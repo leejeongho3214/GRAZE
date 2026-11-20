@@ -10,15 +10,14 @@
 
 <a href="https://leejeongho3214.github.io/GRAZE/"><img src="https://img.shields.io/badge/Project-Page-2f5fd0?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Project page"></a>
 <a href="https://leejeongho3214.github.io/GRAZE/#video"><img src="https://img.shields.io/badge/Video-Watch-14894a?style=for-the-badge&logo=youtube&logoColor=white" alt="Video"></a>
-<img src="https://img.shields.io/badge/Paper-coming%20soon-8b938e?style=for-the-badge&logo=arxiv&logoColor=white" alt="Paper coming soon">
+<a href="https://arxiv.org/abs/2611.21104"><img src="https://img.shields.io/badge/arXiv-2611.21104-b31b1b?style=for-the-badge&logo=arxiv&logoColor=white" alt="arXiv"></a>
 <img src="https://img.shields.io/badge/Code-coming%20soon-8b938e?style=for-the-badge&logo=github&logoColor=white" alt="Code coming soon">
 
 </div>
 
 <br>
 
-<!-- VIDEO: replace the next line by dragging GRAZE_video.mp4 here in the GitHub editor (gives a player with a seek bar). -->
-<p align="center"><a href="https://leejeongho3214.github.io/GRAZE/#video"><img src="static/images/poster.jpg" width="100%" alt="Watch the GRAZE video"></a></p>
+<p align="center"><a href="https://leejeongho3214.github.io/GRAZE/#video"><img src="static/images/preview.gif" width="100%" alt="GRAZE video preview (click for the full video)"></a></p>
 
 <p align="center"><sub>Input recording with gaze → generated grasp on an unseen object → comparison with text-conditioned models → rotating the gaze.</sub></p>
 
