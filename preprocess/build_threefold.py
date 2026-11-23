@@ -2,7 +2,7 @@
 """Build the subject / object 3-fold splits from the pooled HOT3D clips.
 
 Pools gaze_train + gaze_test (915 clips), recovers each clip's subject from its MANO betas
-(scripts/build_subject_split.py), and for every fold k of benchmark/hot3d_grasp/threefold_assignment.json writes
+(preprocess/build_subject_split.py), and for every fold k of benchmark/hot3d_grasp/threefold_assignment.json writes
 
     data/hot3d/dataset/threefold/{obj,subj}{k}_train.pkl   (clips of the other two folds)
     data/hot3d/dataset/threefold/{obj,subj}{k}_test.pkl    (clips of fold k)

@@ -14,8 +14,8 @@ Clips whose beta bytes do not hash-match fall back to a nearest-neighbour lookup
 on the mean beta vector.
 
 Usage:
-    python scripts/build_subject_split.py                 # write the pickles
-    python scripts/build_subject_split.py --dry-run       # report the split only
+    python preprocess/build_subject_split.py                 # write the pickles
+    python preprocess/build_subject_split.py --dry-run       # report the split only
 """
 
 import argparse

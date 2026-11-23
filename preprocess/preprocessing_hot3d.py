@@ -597,8 +597,10 @@ def make_json(save_name="per_object", afford_map_method="frequency"):
         totals["rhand_beta"].append(rhand_beta_list)
         totals["object_idx"].append(int(obj_idx))
         totals["nframes"].append(len(object_rotmat_list))
-        totals["subject"].append(data_path.split("/")[3])
-        totals["background"].append(data_path.split("/")[4])
+        # Placeholders: build_threefold.py / build_subject_split.py overwrite "subject" with the
+        # HOT3D participant, and "background" is not read anywhere ("Text2HOI" in the released splits).
+        totals["subject"].append("")
+        totals["background"].append("Text2HOI")
         totals["cam_pose"].append(cam_pose_list)
         totals["gaze"].append(gaze_datas)
         totals["post_obj"].append(sampled_obj_verts.detach().cpu())
@@ -1093,13 +1095,18 @@ def print_text_data_num():
 
 
 def preprocessing_object():
-    h2o_config = load_config("configs/dataset/hot3d.yaml")
+    h2o_config = load_config(osp.join(PROJECT_ROOT, "configs/dataset/hot3d.yaml"))
 
     obj_pcs = {}
     obj_pc_normals = {}
     point_sets = {}
     obj_path = {}
-    object_paths = glob.glob(osp.join(h2o_config.obj_root, "*.ply"))
+    obj_root = h2o_config.obj_root
+    if not osp.isabs(obj_root):
+        obj_root = osp.join(PROJECT_ROOT, obj_root)
+    # sorted for a deterministic key order (the released obj.pkl has another order; every
+    # consumer looks objects up by name, so the order does not matter)
+    object_paths = sorted(glob.glob(osp.join(obj_root, "*.ply")))
 
     for object_path in tqdm(object_paths):
         mesh = trimesh.load(object_path, process=False)
@@ -1120,8 +1127,8 @@ def preprocessing_object():
         point_sets[key] = point_set[0].cpu().numpy()
         obj_path[key] = "/".join(object_path.split("/")[-2:])
 
-    os.makedirs("data/hot3d/dataset", exist_ok=True)
-    with open("data/hot3d/dataset/obj.pkl", "wb") as f:
+    os.makedirs(osp.join(PROJECT_ROOT, "data/hot3d/dataset"), exist_ok=True)
+    with open(osp.join(PROJECT_ROOT, "data/hot3d/dataset/obj.pkl"), "wb") as f:
         pickle.dump(
             {
                 "object_name": hot3d_obj_name,

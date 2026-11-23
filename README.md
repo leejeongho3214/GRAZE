@@ -71,13 +71,13 @@ The following files are not distributed with this repository. Put them in `asset
 
 | File | Source | Used for |
 |---|---|---|
-| `assets/bps.pt` | `dataset/GRAB_HANDS/bps.pt` of [DiffH2O](https://github.com/facebookresearch/diffh2o): run DiffH2O's `prepare/download_representations.sh` (its README, step "Download data") and copy the file (1,024 basis points, key `obj`) | BPS object encoding and GeoGaze. The released checkpoints work only with this exact basis. |
+| `assets/bps.pt` | [`dataset/GRAB_HANDS/bps.pt`](https://github.com/facebookresearch/diffh2o/blob/main/dataset/GRAB_HANDS/bps.pt) in the [DiffH2O](https://github.com/facebookresearch/diffh2o) repository (1,024 basis points, key `obj`) | BPS object encoding and GeoGaze. The released checkpoints work only with this exact basis. |
 | `assets/part_fps_hand_index_100.npy` | [`assets/part_fps_hand_index_100.npy`](https://github.com/RosettaWYzhang/BimArt/blob/main/assets/part_fps_hand_index_100.npy) in the [BimArt](https://github.com/RosettaWYzhang/BimArt) repository | The 100 MANO vertices per hand that the model predicts |
 | `data/mano/mano_v1_2/models/MANO_{LEFT,RIGHT}.pkl` | [MANO](https://mano.is.tue.mpg.de/) (registration required) | Hand model |
 
 ```bash
-# after running DiffH2O's prepare/download_representations.sh in a DiffH2O clone
-cp /path/to/diffh2o/dataset/GRAB_HANDS/bps.pt assets/bps.pt
+wget -O assets/bps.pt \
+  https://github.com/facebookresearch/diffh2o/raw/main/dataset/GRAB_HANDS/bps.pt
 wget -O assets/part_fps_hand_index_100.npy \
   https://github.com/RosettaWYzhang/BimArt/raw/main/assets/part_fps_hand_index_100.npy
 sha256sum assets/bps.pt assets/part_fps_hand_index_100.npy
@@ -109,7 +109,7 @@ data/
     ├── previous/                     HOT3D object models <id>.glb + instance.json (read by the loader)
     ├── obj/                          <id>.ply  (HOT3D models exported by trimesh; intermediate)
     ├── pre-process/                  <id>.ply  (models simplified to <= 4,000 vertices, read by the data loader)
-    ├── object_mesh/                  <id>.ply  (HOT3D models with merged seam vertices; obj.pkl and the evaluator)
+    ├── object_mesh/                  <id>.ply + instance.json (HOT3D models with merged seam vertices; obj.pkl and the evaluator)
     ├── data/acc_ori.pkl              per-action hand / object / camera / gaze tracks extracted from HOT3D
     ├── pre-process_dataset/acc_ori.pkl   the same tracks, grouped by object
     └── dataset/
@@ -131,8 +131,9 @@ git clone https://github.com/facebookresearch/hot3d.git && cd hot3d
 git checkout aae496b
 git apply /path/to/GRAZE/preprocess/hot3d_toolkit.patch
 cd ..
-# environment for step 1 (or use the toolkit's pixi environment)
-pip install projectaria-tools==1.5.1 smplx torch pandas openpyxl tqdm
+# environment for step 1 (Python 3.10; numpy must stay < 2 for chumpy, which unpickles MANO)
+pip install projectaria-tools==1.5.1 vrs pillow scipy numpy==1.23.5 smplx torch pandas openpyxl tqdm
+pip install --no-build-isolation chumpy==0.70
 ```
 
 Set `HOT3D=/path/to/hot3d_dataset` (the folder that holds the sequences; the object library is
@@ -140,10 +141,15 @@ expected at `$HOT3D/../assets`). Then, from the repository root:
 
 ```bash
 # 1. Per-action tracks from the HOT3D recordings and clip_annotations.csv
-#    -> data/hot3d/data/acc_ori.pkl   (HOT3D toolkit environment, about 1.5 min per sequence)
+#    -> data/hot3d/data/acc_ori.pkl   (HOT3D toolkit environment, about 1.5 min per sequence, 3.3 h in all)
 python preprocess/extract_hot3d_clips.py --hot3d_toolkit /path/to/hot3d/hot3d \
     --hot3d_root $HOT3D --mano_dir data/mano/mano_v1_2/models \
     --annotations benchmark/hot3d_grasp/clip_annotations.csv --out data/hot3d/data/acc_ori.pkl
+#    or in parallel: write 10 sequence lists, run one process per list, merge in annotation order
+#    python preprocess/merge_acc_shards.py split --num_shards 10 --out_dir shards
+#    for k in 00 01 ... 09: python preprocess/extract_hot3d_clips.py <same flags> \
+#        --sequences $(cat shards/shard$k.txt) --out shards/shard$k.pkl
+#    python preprocess/merge_acc_shards.py merge --out data/hot3d/data/acc_ori.pkl shards/shard*.pkl
 # 2. Group by object -> data/hot3d/pre-process_dataset/acc_ori.pkl
 python preprocess/group_by_object.py
 # 3. Object models -> data/hot3d/previous/, data/hot3d/obj/*.ply, data/hot3d/pre-process/*.ply
@@ -151,7 +157,7 @@ python preprocess/convert_object_meshes.py --step library --assets $HOT3D/../ass
 python preprocess/convert_object_meshes.py --step export  --assets $HOT3D/../assets
 pip install pymeshlab==2021.10     # Python <= 3.9; any separate environment works
 python preprocess/convert_object_meshes.py --step simplify --assets $HOT3D/../assets
-#    data/hot3d/object_mesh/*.ply: see the note below (TODO)
+#    data/hot3d/object_mesh/*.ply (+ HOT3D's assets/instance.json): see the note below (TODO)
 # 4. 1,024-point object clouds -> data/hot3d/dataset/obj.pkl   (GPU)
 python preprocess/preprocessing_hot3d.py --step object
 # 5. Clips with contact and gaze maps -> data/hot3d/dataset/ori_dataset/gaze_{train,test}.pkl   (GPU)
@@ -161,19 +167,32 @@ python preprocess/build_threefold.py
 ```
 
 We checked these steps against the files used in the paper:
-step 1 gives the same `acc_ori.pkl` (all 1,044 actions, every array and value equal; it can be
-split over processes with `--sequences` and the outputs concatenated in annotation order),
+step 1 gives the same `acc_ori.pkl` (all 1,044 actions, every array and value equal, also when
+run in 10 shards and merged with `merge_acc_shards.py`),
 step 2 gives a byte-identical file, and steps 3 `export` / `simplify` give byte-identical meshes
-(33 / 33 and 34 / 34 files). Step 4 gives the same point clouds as long as `object_mesh/` is the same.
+(33 / 33 and 34 / 34 files). Step 4 gives the same point clouds, normals and FPS indices for all 32
+objects as long as `object_mesh/` is the same (three objects, `coffee_pot`, `puzzle_toy` and
+`dino_toy`, have a few NaN normals in the released file too; the dictionary order differs, which
+nothing depends on).
 
-**Steps 5–6 (TODO).** Run on the released `acc_ori.pkl`, steps 5–6 give the same 915 clips, in
-the same order, with the same actions, objects, object poses, wrist translations and wrist
-rotations as the splits used in the paper. The finger poses differ, however, and 25 of the 302
-clips of `obj0_test` are one frame longer. The paper's splits were built from an earlier version of
-step 1, which did not fill single-frame gaps and stored different finger-pose values. Until those splits or that extraction are released, rebuilt splits are close to,
-but not the same as, the ones behind the released checkpoints and Table 1.
+**Steps 5–6 (TODO): rebuilt splits differ from the paper's.** Run on the released `acc_ori.pkl`,
+steps 5–6 give the same 915 clips (613 / 302, 604 / 311, 613 / 302 per fold), in the same order,
+with the same actions, objects, parts, subjects, object poses, wrist translations and wrist
+rotations as the splits used in the paper. Everything that depends on the finger poses differs,
+however. The paper's splits were built from an earlier version of step 1, which did not fill
+single-frame gaps and stored different finger-pose values; that version was not recovered.
+In `obj0_test`, the hand joints of all 302 clips differ (by up to 8.4 cm), 25 clips are one frame
+longer, the contact indices change in 99 (left) and 221 (right) clips and the affordance map in
+301. Contact is large enough to flip the left/right contact flags (`is_lhand` / `is_rhand`) in
+75 of the 915 test clips (21 / 21 / 33 per fold), and 64 test clips end up with no ground-truth
+contact (18 / 15 / 31), against 3 in the paper's splits. The 912-clip benchmark and
+`excluded_clips.json` therefore describe the paper's splits only, and numbers on rebuilt
+splits are not comparable to Table 1. Use the rebuilt splits only for new experiments, or wait for
+the paper's splits or the original extraction to be released.
 
 **`object_mesh/` (TODO).** The script that wrote `data/hot3d/object_mesh/*.ply` was not recovered.
+Step 4 also reads `object_mesh/instance.json`: copy HOT3D's `assets/instance.json` there unchanged
+(`previous/instance.json` lacks one of the 32 meshed objects).
 For 30 of the 32 objects these meshes contain exactly the vertices of the HOT3D models after
 merging duplicated seam vertices, but in a different vertex and face order (the faces are the
 HOT3D faces regrouped into two or three blocks); the other two objects differ slightly. Merging the seam vertices of the HOT3D

@@ -2,7 +2,7 @@
 
 One GRAZE checkpoint per object fold (`graze_obj0.pth`, `graze_obj1.pth`, `graze_obj2.pth`),
 attached to the [v1.0 release](https://github.com/leejeongho3214/GRAZE/releases/tag/v1.0).
-Download them into this folder and verify them:
+Download them into this folder and verify them (run from the repository root):
 
 ```bash
 for k in 0 1 2; do
