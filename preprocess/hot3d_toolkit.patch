@@ -1,0 +1,82 @@
+diff -ruN a/hot3d/data_loaders/ManoHandDataProvider.py b/hot3d/data_loaders/ManoHandDataProvider.py
+--- a/hot3d/data_loaders/ManoHandDataProvider.py
++++ b/hot3d/data_loaders/ManoHandDataProvider.py
+@@ -66,16 +66,15 @@
+             hand_wrist_pose_tensor = torch.cat(
+                 [hand_wrist_rotation_axis_angle, hand_wrist_pose_tensor[:3, 3]]
+             )
+-
+-            mesh_vertices, landmarks = self.mano_layer.forward_kinematics(
++            
++            mesh_vertices, landmarks, left_mano_output, right_mano_output = self.mano_layer.forward_kinematics(
+                 self._mano_shape_params,
+                 torch.from_numpy(np.array(hand_wrist_data.joint_angles)),
+                 hand_wrist_pose_tensor,
+                 torch.tensor([hand_wrist_data.handedness == Handedness.Right]),
+             )
+-
+-            return mesh_vertices
+-        return None
++            return mesh_vertices, landmarks, left_mano_output, right_mano_output
++        assert False, "Hand wrist data is missing wrist pose or joint angles, or MANO shape params is not available, or MANO layer is not initialized."
+ 
+     def get_hand_mesh_faces_and_normals(
+         self, hand_wrist_data: HandPose
+@@ -89,8 +88,9 @@
+             else:
+                 hand_triangles = self.mano_layer.mano_layer_left.faces
+ 
+-            vertices = self.get_hand_mesh_vertices(hand_wrist_data)
+-            assert vertices is not None
++            mesh_result = self.get_hand_mesh_vertices(hand_wrist_data)
++            assert mesh_result is not None
++            vertices = mesh_result[0]
+             normals = HandDataProviderBase.get_triangular_mesh_normals(
+                 vertices.float().numpy(), hand_triangles
+             )
+@@ -118,7 +118,7 @@
+                 [hand_wrist_rotation_axis_angle, hand_wrist_pose_tensor[:3, 3]]
+             )
+ 
+-            mesh_vertices, hand_landmarks = self.mano_layer.forward_kinematics(
++            _, hand_landmarks, _, _ = self.mano_layer.forward_kinematics(
+                 self._mano_shape_params,
+                 torch.from_numpy(np.array(hand_wrist_data.joint_angles)),
+                 hand_wrist_pose_tensor,
+diff -ruN a/hot3d/data_loaders/mano_layer.py b/hot3d/data_loaders/mano_layer.py
+--- a/hot3d/data_loaders/mano_layer.py
++++ b/hot3d/data_loaders/mano_layer.py
+@@ -127,7 +127,7 @@
+         assert is_right_hand.shape[0] == joint_angles.shape[0]
+ 
+         num_frames = joint_angles.shape[0]
+-
++        left_mano_output, right_mano_output = None, None
+         # Left hand FK
+         if torch.any(torch.logical_not(is_right_hand)):
+             left_global_xform = global_xfrom[torch.logical_not(is_right_hand)]
+@@ -140,6 +140,7 @@
+                 hand_pose=left_joint_angles.to(self.dtype),
+                 transl=left_global_xform[:, 3:].to(self.dtype),
+                 return_verts=True,  # MANO doesn't return landmarks as well if this is false
++                return_full_pose=True,
+             )
+ 
+         # Right hand FK
+@@ -154,6 +155,7 @@
+                 hand_pose=right_joint_angles.to(self.dtype),
+                 transl=right_global_xform[:, 3:].to(self.dtype),
+                 return_verts=True,  # MANO doesn't return landmarks as well if this is false
++                return_full_pose=True,
+             )
+ 
+         # Merge the left and right hand outputs
+@@ -214,7 +216,7 @@
+             out_vertices = torch.squeeze(out_vertices, 0)
+             out_landmarks = torch.squeeze(out_landmarks, 0)
+ 
+-        return out_vertices, out_landmarks
++        return out_vertices, out_landmarks, left_mano_output, right_mano_output
+ 
+     def shape_only_forward_kinematics(
+         self,

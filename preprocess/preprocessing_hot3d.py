@@ -1120,8 +1120,8 @@ def preprocessing_object():
         point_sets[key] = point_set[0].cpu().numpy()
         obj_path[key] = "/".join(object_path.split("/")[-2:])
 
-    os.makedirs("data/hot3d", exist_ok=True)
-    with open("data/hot3d/obj.pkl", "wb") as f:
+    os.makedirs("data/hot3d/dataset", exist_ok=True)
+    with open("data/hot3d/dataset/obj.pkl", "wb") as f:
         pickle.dump(
             {
                 "object_name": hot3d_obj_name,

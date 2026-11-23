@@ -13,7 +13,9 @@
 <a href="https://arxiv.org/abs/2611.21104"><img src="https://img.shields.io/badge/arXiv-2611.21104-b31b1b?style=for-the-badge&logo=arxiv&logoColor=white" alt="arXiv"></a>
 <a href="#pretrained-models"><img src="https://img.shields.io/badge/Code-available-2f8f5b?style=for-the-badge&logo=github&logoColor=white" alt="Code"></a>
 
-<!-- TODO: author list and affiliations -->
+[Jeongho Lee](https://github.com/leejeongho3214)<sup>1</sup> · Boeun Kim<sup>1</sup> · Hyung Jin Chang<sup>2</sup> · Jungchan Cho<sup>3</sup> · Sang-Il Choi<sup>1</sup>
+
+<sup>1</sup>Dankook University · <sup>2</sup>University of Birmingham · <sup>3</sup>Gachon University
 
 </div>
 
@@ -69,11 +71,19 @@ The following files are not distributed with this repository. Put them in `asset
 
 | File | Source | Used for |
 |---|---|---|
-| `assets/bps.pt` | `GRAB_HANDS/bps.pt` from the [DiffH2O](https://github.com/facebookresearch/diffh2o) data release (1,024 basis points, key `obj`) | BPS object encoding and GeoGaze. The released checkpoints work only with this exact basis. |
-| `assets/part_fps_hand_index_100.npy` | `assets/part_fps_hand_index_100.npy` from [BimArt](https://github.com/RosettaWYzhang/BimArt) | The 100 MANO vertices per hand that the model predicts |
+| `assets/bps.pt` | `dataset/GRAB_HANDS/bps.pt` of [DiffH2O](https://github.com/facebookresearch/diffh2o): run DiffH2O's `prepare/download_representations.sh` (its README, step "Download data") and copy the file (1,024 basis points, key `obj`) | BPS object encoding and GeoGaze. The released checkpoints work only with this exact basis. |
+| `assets/part_fps_hand_index_100.npy` | [`assets/part_fps_hand_index_100.npy`](https://github.com/RosettaWYzhang/BimArt/blob/main/assets/part_fps_hand_index_100.npy) in the [BimArt](https://github.com/RosettaWYzhang/BimArt) repository | The 100 MANO vertices per hand that the model predicts |
 | `data/mano/mano_v1_2/models/MANO_{LEFT,RIGHT}.pkl` | [MANO](https://mano.is.tue.mpg.de/) (registration required) | Hand model |
 
-<!-- TODO: confirm the download locations of bps.pt and part_fps_hand_index_100.npy -->
+```bash
+# after running DiffH2O's prepare/download_representations.sh in a DiffH2O clone
+cp /path/to/diffh2o/dataset/GRAB_HANDS/bps.pt assets/bps.pt
+wget -O assets/part_fps_hand_index_100.npy \
+  https://github.com/RosettaWYzhang/BimArt/raw/main/assets/part_fps_hand_index_100.npy
+sha256sum assets/bps.pt assets/part_fps_hand_index_100.npy
+# b1ab4b0c73fd3c65c350bbdaad495cac374282480c53aedd26ee2045f38a0e7c  assets/bps.pt
+# 6c73242365294fc029be8a6025ebc70aa0f49255798d7e681279d3c06d61d327  assets/part_fps_hand_index_100.npy
+```
 
 ## Data preparation
 
@@ -97,8 +107,9 @@ data/
 ├── mano/mano_v1_2/models/            MANO_LEFT.pkl, MANO_RIGHT.pkl
 └── hot3d/
     ├── previous/                     HOT3D object models <id>.glb + instance.json (read by the loader)
-    ├── object_mesh/                  <id>.ply  (HOT3D models as .ply)
-    ├── pre-process/                  <id>.ply  (simplified HOT3D models, read by the data loader)
+    ├── obj/                          <id>.ply  (HOT3D models exported by trimesh; intermediate)
+    ├── pre-process/                  <id>.ply  (models simplified to <= 4,000 vertices, read by the data loader)
+    ├── object_mesh/                  <id>.ply  (HOT3D models with merged seam vertices; obj.pkl and the evaluator)
     ├── data/acc_ori.pkl              per-action hand / object / camera / gaze tracks extracted from HOT3D
     ├── pre-process_dataset/acc_ori.pkl   the same tracks, grouped by object
     └── dataset/
@@ -107,23 +118,69 @@ data/
         └── threefold/obj{0,1,2}_{train,test}.pkl, manifest.json
 ```
 
-Steps:
+### Building the benchmark from HOT3D
+
+You need the full HOT3D dataset (the sequences `P00xx_xxxxxxxx/` and the object library `assets/`)
+and the [HOT3D toolkit](https://github.com/facebookresearch/hot3d) with
+[`projectaria_tools`](https://github.com/facebookresearch/projectaria_tools). We used toolkit commit
+`aae496b` with `projectaria_tools` 1.5.1 (the toolkit's `pixi.lock` pins 1.5.2) on Python 3.10.
+Step 1 needs a small patch to the toolkit, so that its MANO layer also returns the full hand pose:
+
+```bash
+git clone https://github.com/facebookresearch/hot3d.git && cd hot3d
+git checkout aae496b
+git apply /path/to/GRAZE/preprocess/hot3d_toolkit.patch
+cd ..
+# environment for step 1 (or use the toolkit's pixi environment)
+pip install projectaria-tools==1.5.1 smplx torch pandas openpyxl tqdm
+```
+
+Set `HOT3D=/path/to/hot3d_dataset` (the folder that holds the sequences; the object library is
+expected at `$HOT3D/../assets`). Then, from the repository root:
 
 ```bash
 # 1. Per-action tracks from the HOT3D recordings and clip_annotations.csv
-#    -> data/hot3d/data/acc_ori.pkl
-#    TODO: extraction script (HOT3D toolkit) not included yet
+#    -> data/hot3d/data/acc_ori.pkl   (HOT3D toolkit environment, about 1.5 min per sequence)
+python preprocess/extract_hot3d_clips.py --hot3d_toolkit /path/to/hot3d/hot3d \
+    --hot3d_root $HOT3D --mano_dir data/mano/mano_v1_2/models \
+    --annotations benchmark/hot3d_grasp/clip_annotations.csv --out data/hot3d/data/acc_ori.pkl
 # 2. Group by object -> data/hot3d/pre-process_dataset/acc_ori.pkl
 python preprocess/group_by_object.py
-# 3. Object meshes -> data/hot3d/object_mesh/*.ply and data/hot3d/pre-process/*.ply
-#    TODO: conversion script not included yet
-# 4. 1,024-point object clouds -> data/hot3d/dataset/obj.pkl
+# 3. Object models -> data/hot3d/previous/, data/hot3d/obj/*.ply, data/hot3d/pre-process/*.ply
+python preprocess/convert_object_meshes.py --step library --assets $HOT3D/../assets
+python preprocess/convert_object_meshes.py --step export  --assets $HOT3D/../assets
+pip install pymeshlab==2021.10     # Python <= 3.9; any separate environment works
+python preprocess/convert_object_meshes.py --step simplify --assets $HOT3D/../assets
+#    data/hot3d/object_mesh/*.ply: see the note below (TODO)
+# 4. 1,024-point object clouds -> data/hot3d/dataset/obj.pkl   (GPU)
 python preprocess/preprocessing_hot3d.py --step object
-# 5. Clips with contact and gaze maps -> data/hot3d/dataset/ori_dataset/gaze_{train,test}.pkl
+# 5. Clips with contact and gaze maps -> data/hot3d/dataset/ori_dataset/gaze_{train,test}.pkl   (GPU)
 python preprocess/preprocessing_hot3d.py --step clips
-# 6. Pool both splits (915 clips) and write the 3-fold splits
+# 6. Pool both splits (915 clips) and write the 3-fold splits -> data/hot3d/dataset/threefold/
 python preprocess/build_threefold.py
 ```
+
+We checked these steps against the files used in the paper:
+step 1 gives the same `acc_ori.pkl` (all 1,044 actions, every array and value equal; it can be
+split over processes with `--sequences` and the outputs concatenated in annotation order),
+step 2 gives a byte-identical file, and steps 3 `export` / `simplify` give byte-identical meshes
+(33 / 33 and 34 / 34 files). Step 4 gives the same point clouds as long as `object_mesh/` is the same.
+
+**Steps 5–6 (TODO).** Run on the released `acc_ori.pkl`, steps 5–6 give the same 915 clips, in
+the same order, with the same actions, objects, object poses, wrist translations and wrist
+rotations as the splits used in the paper. The finger poses differ, however, and 25 of the 302
+clips of `obj0_test` are one frame longer. The paper's splits were built from an earlier version of
+step 1, which did not fill single-frame gaps and stored different finger-pose values. Until those splits or that extraction are released, rebuilt splits are close to,
+but not the same as, the ones behind the released checkpoints and Table 1.
+
+**`object_mesh/` (TODO).** The script that wrote `data/hot3d/object_mesh/*.ply` was not recovered.
+For 30 of the 32 objects these meshes contain exactly the vertices of the HOT3D models after
+merging duplicated seam vertices, but in a different vertex and face order (the faces are the
+HOT3D faces regrouped into two or three blocks); the other two objects differ slightly. Merging the seam vertices of the HOT3D
+models (for example with Open3D's `remove_duplicated_vertices`) gives the same vertex set, but
+farthest point sampling then picks different points for most objects, so `obj.pkl` and the part
+labels in `labels_merged.json` (indices into those points) no longer match. Until this step is
+released, the released `obj.pkl` order cannot be rebuilt from HOT3D alone.
 
 Training, inference and evaluation read only `obj.pkl`, the `threefold/` files, the meshes and
 `previous/instance.json`; `data/acc_ori.pkl`, `pre-process_dataset/` and `ori_dataset/` are needed
@@ -143,8 +200,16 @@ There is one checkpoint per object fold. Each is the epoch-4000 model used in th
 | obj1 | `graze_obj1.pth` |
 | obj2 | `graze_obj2.pth` |
 
-Download: **TODO (link)**. Put the files in `checkpoints/` and check them against
-[`checkpoints/SHA256SUMS`](checkpoints/SHA256SUMS). Each checkpoint stores the model weights, the
+The checkpoints are attached to the [v1.0 release](https://github.com/leejeongho3214/GRAZE/releases/tag/v1.0):
+
+```bash
+for k in 0 1 2; do
+  wget -P checkpoints https://github.com/leejeongho3214/GRAZE/releases/download/v1.0/graze_obj${k}.pth
+done
+(cd checkpoints && sha256sum -c SHA256SUMS)
+```
+
+Check them against [`checkpoints/SHA256SUMS`](checkpoints/SHA256SUMS). Each checkpoint stores the model weights, the
 model settings and the motion normalization statistics.
 
 ## Training
@@ -263,9 +328,9 @@ Implementation details that are easy to miss:
 ## Citation
 
 ```bibtex
-@article{graze2026,
-  title   = {GRAZE: Text-Free Grasp Synthesis for Unseen Objects from Human Gaze},
-  author  = {TODO},
+@article{lee2026graze,
+  title   = {{GRAZE}: Text-Free Grasp Synthesis for Unseen Objects from Human Gaze},
+  author  = {Lee, Jeongho and Kim, Boeun and Chang, Hyung Jin and Cho, Jungchan and Choi, Sang-Il},
   journal = {arXiv preprint arXiv:2611.21104},
   year    = {2026}
 }
@@ -279,9 +344,15 @@ other projects under their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PART
 The following are not part of this repository and keep their own terms: HOT3D, MANO, the
 DiffH2O/GRAB BPS basis, and the BimArt hand-vertex indices.
 
-The files in `benchmark/hot3d_grasp/` annotate HOT3D; see
-[benchmark/hot3d_grasp/README.md](benchmark/hot3d_grasp/README.md).
-<!-- TODO: license of the pretrained checkpoints (trained on HOT3D) -->
+Other parts of the release have their own licenses:
+
+- **Pretrained checkpoints** (`graze_obj{0,1,2}.pth`):
+  [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/). They were trained on HOT3D and
+  depend on the DiffH2O BPS basis (CC BY-NC 4.0).
+- **HOT3D-Grasp annotations** (`benchmark/hot3d_grasp/`):
+  [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). They annotate HOT3D, so
+  you must also comply with the [HOT3D license](https://www.projectaria.com/datasets/hot3d/license/). See
+  [benchmark/hot3d_grasp/README.md](benchmark/hot3d_grasp/README.md).
 
 ## Acknowledgements
 

@@ -1,0 +1,44 @@
+cff-version: 1.2.0
+message: "If you use this code or the HOT3D-Grasp benchmark, please cite the paper below."
+title: "GRAZE: Text-Free Grasp Synthesis for Unseen Objects from Human Gaze"
+type: software
+license: MIT
+repository-code: "https://github.com/leejeongho3214/GRAZE"
+url: "https://leejeongho3214.github.io/GRAZE/"
+authors:
+  - family-names: Lee
+    given-names: Jeongho
+    affiliation: Dankook University
+  - family-names: Kim
+    given-names: Boeun
+    affiliation: Dankook University
+  - family-names: Chang
+    given-names: Hyung Jin
+    affiliation: University of Birmingham
+  - family-names: Cho
+    given-names: Jungchan
+    affiliation: Gachon University
+  - family-names: Choi
+    given-names: Sang-Il
+    affiliation: Dankook University
+preferred-citation:
+  type: article
+  title: "GRAZE: Text-Free Grasp Synthesis for Unseen Objects from Human Gaze"
+  authors:
+    - family-names: Lee
+      given-names: Jeongho
+    - family-names: Kim
+      given-names: Boeun
+    - family-names: Chang
+      given-names: Hyung Jin
+    - family-names: Cho
+      given-names: Jungchan
+    - family-names: Choi
+      given-names: Sang-Il
+  journal: "arXiv preprint arXiv:2611.21104"
+  year: 2026
+  identifiers:
+    - type: other
+      value: "arXiv:2611.21104"
+      description: arXiv identifier
+  url: "https://arxiv.org/abs/2611.21104"
