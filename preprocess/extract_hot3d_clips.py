@@ -15,13 +15,14 @@ extraction the paper's splits were built with.
 Frames for which a hand / object / headset pose or the gaze is missing are dropped (the clip gets
 shorter), as in the paper's extraction.
 
-Two options reproduce a later (Jun-8) variant of this script that was NOT used for the paper's
-splits: --keep_hand_mean stores smplx `full_pose` (mean included; downstream then adds the mean a
+Two options reproduce an earlier released version of this script that was NOT used for the
+paper's splits: --keep_hand_mean stores smplx `full_pose` (mean included; downstream then adds the mean a
 second time, about 2.8 cm joint error) and --fill_single_frame_gaps replaces a single missing frame
 by a copy of an adjacent frame (62 frames in 61 actions). Do not use them to rebuild the benchmark.
 
 Needs the HOT3D toolkit (https://github.com/facebookresearch/hot3d, commit aae496b) with
-preprocess/hot3d_toolkit.patch applied (it makes the MANO layer return the full pose), and
+preprocess/hot3d_toolkit.patch applied (it makes the MANO layer return the smplx MANO output, whose
+`hand_pose` and `full_pose` are used here), and
 projectaria_tools. Run it with the toolkit's `hot3d/` folder on PYTHONPATH or pass --hot3d_toolkit:
 
     python preprocess/extract_hot3d_clips.py \
@@ -50,10 +51,10 @@ _parser.add_argument("--out", default=os.path.join(_PROJECT_ROOT, "data/hot3d/da
 _parser.add_argument("--sequences", nargs="*", default=None,
                      help="only process these sequence IDs (for testing; default: all annotated sequences)")
 _parser.add_argument("--keep_hand_mean", action="store_true",
-                     help="Jun-8 variant, not used for the paper: store smplx full_pose (MANO hands_mean "
+                     help="earlier released version, not used for the paper: store smplx full_pose (MANO hands_mean "
                           "included) instead of the mean-free hand_pose")
 _parser.add_argument("--fill_single_frame_gaps", action="store_true",
-                     help="Jun-8 variant, not used for the paper: replace a single missing frame by a copy "
+                     help="earlier released version, not used for the paper: replace a single missing frame by a copy "
                           "of an adjacent valid frame instead of dropping it")
 _args = _parser.parse_args()
 if _args.hot3d_toolkit is not None:
@@ -207,13 +208,14 @@ def mano_pose_48(mano_output):
     Default (paper convention): the 45-d finger pose is smplx's `hand_pose`, i.e. WITHOUT the MANO
     mean pose. smplx computes full_pose = cat(global_orient, hand_pose) + pose_mean, where pose_mean
     is zero for global_orient and `hands_mean` for the fingers (flat_hand_mean=False in the toolkit).
-    With --keep_hand_mean (Jun-8 variant, not used for the paper) `full_pose` is stored instead.
+    With --keep_hand_mean (earlier released version, not used for the paper) `full_pose` is stored.
     """
     full_pose = to_numpy(mano_output.full_pose).flatten()
+    assert full_pose.shape == (48,), full_pose.shape
     if _args.keep_hand_mean:
         return full_pose
     hand_pose = to_numpy(mano_output.hand_pose).flatten()
-    assert full_pose.shape == (48,) and hand_pose.shape == (45,), (full_pose.shape, hand_pose.shape)
+    assert hand_pose.shape == (45,), hand_pose.shape
     return np.concatenate([full_pose[:3], hand_pose])
 
 

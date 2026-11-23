@@ -124,7 +124,8 @@ You need the full HOT3D dataset (the sequences `P00xx_xxxxxxxx/` and the object 
 and the [HOT3D toolkit](https://github.com/facebookresearch/hot3d) with
 [`projectaria_tools`](https://github.com/facebookresearch/projectaria_tools). We used toolkit commit
 `aae496b` with `projectaria_tools` 1.5.1 (the toolkit's `pixi.lock` pins 1.5.2) on Python 3.10.
-Step 1 needs a small patch to the toolkit, so that its MANO layer also returns the full hand pose:
+Step 1 needs a small patch to the toolkit, so that its MANO layer returns the smplx MANO output
+(whose `hand_pose` step 1 stores):
 
 ```bash
 git clone https://github.com/facebookresearch/hot3d.git && cd hot3d
@@ -141,11 +142,11 @@ expected at `$HOT3D/../assets`). Then, from the repository root:
 
 ```bash
 # 1. Per-action tracks from the HOT3D recordings and clip_annotations.csv
-#    -> data/hot3d/data/acc_ori.pkl   (HOT3D toolkit environment, about 1.5 min per sequence, 3.3 h in all)
+#    -> data/hot3d/data/acc_ori.pkl   (HOT3D toolkit environment, 5 to 20 s per sequence, under 45 min in all)
 python preprocess/extract_hot3d_clips.py --hot3d_toolkit /path/to/hot3d/hot3d \
     --hot3d_root $HOT3D --mano_dir data/mano/mano_v1_2/models \
     --annotations benchmark/hot3d_grasp/clip_annotations.csv --out data/hot3d/data/acc_ori.pkl
-#    or in parallel: write 10 sequence lists, run one process per list, merge in annotation order
+#    or in parallel (about 1 to 4 min in 10 shards): write 10 sequence lists, run one process per list, merge in annotation order
 #    python preprocess/merge_acc_shards.py split --num_shards 10 --out_dir shards
 #    for k in 00 01 ... 09: python preprocess/extract_hot3d_clips.py <same flags> \
 #        --sequences $(cat shards/shard$k.txt) --out shards/shard$k.pkl
@@ -166,35 +167,42 @@ python preprocess/preprocessing_hot3d.py --step clips
 python preprocess/build_threefold.py
 ```
 
-We checked these steps against the files used in the paper. Run in 10 shards and merged, step 1
-followed by steps 2, 5 and 6 gives the same six object-fold splits (`obj{0,1,2}_{train,test}`) as
-the paper: the same 915 clips (613 / 302, 604 / 311, 613 / 302 per fold) in the same order, with
-identical actions, objects, parts, subjects, frame counts, object poses, camera poses, gaze rays and
-left/right contact flags (`is_lhand` / `is_rhand`, 0 flips), and finger poses and hand joints equal
-up to float32 rounding (at most 1.5e-7 in `x_lhand` / `x_rhand`, 2.4e-7 m in the joints). What is
-left are threshold effects of that rounding. In 140 of the 915 test clips the point-level contact
-lists (`*cf_idx` / `*cov_idx` / `*chj_idx`) gain or lose one to three hand-object pairs, and all 162
-such pairs lie within 1e-5 of the 2 cm contact threshold (0.019993 to 0.020000 m). The finer
-vertex-level lists (`*_ver_idx`, about 113,000 pairs per clip) differ by a median of 5 pairs (at
-most 52, under 0.1 %). The affordance maps change, by at most 0.029, only in the (object, prompt)
-groups that contain such a clip.
-The per-frame gaze maps differ only in the 10 clips whose HOT3D eye gaze is missing (NaN) in some
-frames (actions 54, 368, 432, 701, 820, 856, 992, 1118, 1119, 1362): the paper-era extraction kept
-one gaze entry per annotated frame for these clips, so their `gaze_map` / `score_map` were computed
-from a gaze list longer than the clip (and, after the first missing frame, offset from the poses).
-The released model does not read `gaze_map` or `score_map` (it uses the gaze rays). Step 2 gives a
-byte-identical file, and steps 3 `export` / `simplify` give byte-identical meshes (33 / 33 and
-34 / 34 files). Step 4 gives the same point clouds, normals and FPS indices for all 32 objects as
-long as `object_mesh/` is the same (three objects, `coffee_pot`, `puzzle_toy` and `dino_toy`, have
+We checked these steps against the files used in the paper. With the paper's `obj.pkl` (and
+therefore its `object_mesh/`, see the TODO below; steps 2 and 3 reproduce the other inputs exactly),
+step 1 (run in 10 shards and merged) followed by steps 2, 5 and 6 gives the same six object-fold
+splits (`obj{0,1,2}_{train,test}`) as the paper: the same 915 clips (613 / 302, 604 / 311,
+613 / 302 per fold) in the same order, with identical actions, objects, parts, subjects, frame
+counts, object poses, camera poses, gaze rays and left/right contact flags (`is_lhand` /
+`is_rhand`, 0 flips), and finger poses and hand joints equal up to float32 rounding (at most 1.5e-7
+in `x_lhand` / `x_rhand`, 2.4e-7 m in the joints). The subject folds (`subj*`) match in the same way.
+What is left comes from recomputing the hand-object distances, which agree only to about 1e-4 m
+(most likely `torch.cdist` in float32 on a different GPU and PyTorch version). In 140 of the 915 test clips
+the point-level contact lists (`*cf_idx` / `*cov_idx` / `*chj_idx`) gain or lose one to three
+hand-object pairs, and all 162 such pairs lie within 1e-5 m of the 2 cm contact threshold (0.019993
+to 0.020000 m). The set of contact frames, and so the first contact frame, is identical in all
+clips. The stored per-pair distances (`*dist_value`) agree to 1.5e-4 m where both files have the
+pair, and are shifted where a pair was gained or lost; the loader turns them into `*dist_map`, which
+is only used as a contact mask. The vertex-level lists (`*_ver_idx`, median about 105,000 pairs per
+clip) differ in 793 of the 915 test clips, by a median of 5 pairs (at most 52, under 0.1 %). The
+affordance maps, which are built from the vertex-level lists, differ in 91 test clips (at most
+0.029), all in (object, prompt) groups with a vertex-level difference.
+The per-frame gaze maps differ only for the 10 actions whose HOT3D eye gaze is missing (NaN) in some
+frames (actions 54, 368, 432, 701, 820, 856, 992, 1118, 1119, 1362; one test and two training clips
+each across the three folds). The paper-era extraction kept one gaze entry per annotated frame for
+these actions, so their `gaze_map` / `score_map` were computed from a gaze list longer than the clip
+(and, in 6 of the 10, offset from the poses after the first missing frame). The released model does
+not read `gaze_map` or `score_map` (it uses the gaze rays). Step 2 gives a byte-identical file, and
+steps 3 `export` / `simplify` give byte-identical meshes (33 / 33 and 34 / 34 files). Step 4 gives the same point clouds, normals and FPS indices for all 32 objects
+as long as `object_mesh/` is the same (three objects, `coffee_pot`, `puzzle_toy` and `dino_toy`, have
 a few NaN normals in the released file too; the dictionary order differs, which nothing depends on).
 
 **Hand-pose convention of step 1.** `extract_hot3d_clips.py` stores each hand's 45-d finger pose
 without the MANO mean pose (smplx `hand_pose`), and drops frames with a missing hand, object or
 headset pose or gaze, as the extraction behind the paper's splits did. The HOT3D toolkit's MANO
 layer uses `flat_hand_mean=False`, so its `full_pose` already contains the mean; step 5 adds the
-mean back exactly once (`build_mano_aa(flat_hand=False)`). A later (Jun-8) version of step 1, not used for
-the paper, stored `full_pose` (mean added twice downstream, about 2.8 cm joint error, contact flags
-flipped in 75 test clips) and filled single-frame gaps with a copy of the neighbouring frame (62
+mean back exactly once (`build_mano_aa(flat_hand=False)`). An earlier released version of this
+script, not used for the paper's splits, stored `full_pose` (mean added twice downstream, about
+2.8 cm joint error, contact flags flipped in 75 test clips) and filled single-frame gaps with a copy of the neighbouring frame (62
 frames in 61 actions, the reason why 25 `obj0_test` clips were one frame longer). Only that variant
 writes an `acc_ori.pkl` with the mean included; it is kept behind `--keep_hand_mean` and
 `--fill_single_frame_gaps` for reference, and step 5 refuses an `acc_ori.pkl` whose finger poses

@@ -503,6 +503,9 @@ def check_hand_pose_convention(data, left_hand_mean, right_hand_mean):
         poses = np.concatenate(poses) if poses else np.zeros((0, 45))
         if len(poses) == 0:
             continue
+        poses = poses[np.isfinite(poses).all(1)]
+        if len(poses) == 0:
+            raise ValueError(f"{name}-hand finger poses in acc_ori.pkl are all non-finite.")
         mean_pose = poses.mean(0)
         dist_zero = float(np.linalg.norm(mean_pose))
         dist_mean = float(np.linalg.norm(mean_pose - np.asarray(hand_mean).reshape(-1)))
@@ -534,7 +537,7 @@ def make_json(save_name="per_object", afford_map_method="frequency"):
     # Pose convention: acc_ori.pkl stores the 45-d finger pose of each hand WITHOUT the MANO mean
     # pose (smplx `hand_pose`, the default of extract_hot3d_clips.py). These layers use
     # flat_hand_mean=False, i.e. they add `hands_mean` to the finger pose once. A file written with
-    # extract_hot3d_clips.py --keep_hand_mean (Jun-8 variant, mean already included) would get the
+    # extract_hot3d_clips.py --keep_hand_mean (earlier released version, mean already included) would get the
     # mean twice; check_hand_pose_convention() refuses such a file.
     lhand_layer = build_mano_aa(is_rhand=False, flat_hand=False)
     lhand_layer = lhand_layer.cuda()
