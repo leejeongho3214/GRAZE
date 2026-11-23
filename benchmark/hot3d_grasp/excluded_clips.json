@@ -1,0 +1,24 @@
+{
+ "description": "Clips without hand-object contact in the ground truth, dropped from every metric (912-clip benchmark). Index = position of the clip in <fold>_test.pkl (= sample_idx modulo the number of test clips).",
+ "object_folds": {
+  "obj0": [
+   263
+  ],
+  "obj1": [
+   32
+  ],
+  "obj2": [
+   67
+  ]
+ },
+ "subject_folds": {
+  "subj0": [
+   7,
+   54
+  ],
+  "subj1": [
+   281
+  ],
+  "subj2": []
+ }
+}

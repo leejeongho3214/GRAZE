@@ -1,0 +1,137 @@
+# GRAZE model / experiment config.
+# Defaults reproduce the released model (paper: 3-fold HOT3D-Grasp, first-30% gaze).
+# The Hydra group keeps the upstream Text2HOI name `texthom`; checkpoints store the
+# model knobs below as flat keys, so do not rename keys.
+model:
+  # Transformer denoiser
+  latent_dim: 512
+  ff_size: 1024
+  num_layers: 8
+  num_heads: 4
+  dropout: 0.1
+  activation: gelu
+  cond_mask_prob: 0.1
+  use_cond_fc: True
+  use_frame_pos: True
+
+  # Object geometry condition: BPS displacement (K x 3) + object scale
+  object_feature_type: bps # bps, pointnet
+  object_bps_feature_mode: displacement # distance, displacement
+  # GeoGaze: ray closeness + displacement alignment on the BPS points, one token per frame
+  gaze_condition_mode: bps_ray_alignment_tokens_temporal
+  # Ray-closeness Gaussian width (in normalized object units). Not restored from the
+  # checkpoint at test time, so it must stay here.
+  gaze_ray_distance_sigma_method2: 0.15
+  # (ablation) direct object-relative gaze encoding, used only with gaze_condition_mode=relative_gaze_mlp
+  relative_gaze_sequence_length: 100
+  relative_gaze_feat_dim: 128
+  relative_gaze_hidden_dim: 256
+  relative_gaze_dropout: 0.1
+  # (ablation) replace every gaze-derived condition with zeros at train and test
+  null_gaze_condition: False
+  # Gaze conditioning: hand tokens cross-attend to gaze tokens, then object tokens attend to hands
+  gaze_token_fusion: cross_attn # add, film, token, cross_attn, append
+  cross_attn_order: hand_object # hand_object, object_hand, parallel
+  # Token weighting controls (identity for the released model)
+  gaze_ray_weight: 1.0
+  gaze_align_weight: 1.0
+  gaze_ray_frame_normalize: False
+  gaze_ray_norm_min_peak: 0.0
+  # (ablation) ray channel transform: gaussian (released) | inv
+  gaze_ray_transform: gaussian
+  gaze_ray_inv_scale_cm: 4.0
+  gaze_ray_center: 0.0
+  # Object pose used to express the gaze: initial object frame (released) | trajectory
+  gaze_object_pose_mode: initial
+  # (ablations, off) diffusion-time lag between hand and object, cascades, attention masks
+  obj_diffusion_lag: 0
+  cascade_mode: none
+  stream_mask: none
+  gazeflow_every_layer: False
+  gaze_memory_extras: none
+  # (ablations, off) same-backbone target-part label / CLIP text conditions
+  use_part_label: False
+  use_text_condition: False
+  text_condition_template: action
+  text_max_len: 20
+  target_condition_slot: emb
+
+  # How ray + alignment reach the model: concat = one 2K-d token per frame (released)
+  gaze_both_fusion: concat
+  gaze_gate_gamma: 1.0
+  gaze_ray_only_fixes: False
+  gaze_ray_temporal_accumulate: none
+  gaze_align_rescale: none
+  gaze_separate_cue_projection: False
+  mask_empty_gaze_tokens: False
+  # Auxiliary head kept only so the released checkpoints load; it is not part of
+  # the training objective and its output is unused.
+  use_lift_gate: True
+  gaze_alignment_temporal_scope: all # all, until_contact
+
+  # Output: 100 hand points (+ direction vectors) per hand and a relative 9D object pose
+  output_representation: point # point, pose
+  point_token_count: 100
+  canonicalize_point_targets: True
+  predict_object_pose: True
+  use_obj_scale: True
+  use_obj_centroid: False
+  motion_normalization_min_std: 0.0001
+
+exp:
+  name: graze_${fold}
+  # 4000 epochs (iteration is the upstream Text2HOI counter, used only when epochs is null)
+  epochs: 4000
+  iteration: 31050
+  seed: 0
+  deterministic: False
+  # First 30% of the valid frames keep their gaze; the rest is zeroed (train and test)
+  train_gaze_keep_window: first
+  train_gaze_keep_frac: 0.3
+  gaze_keep_window: first
+  gaze_keep_frac: 0.3
+  # (analysis, off) test-time gaze corruptions
+  gaze_noise_mode: none
+  gaze_rotation_std_deg: 2.0
+  gaze_translation_std_m: 0.005
+  gaze_frame_hold_interval: 5
+  gaze_frame_drop_prob: 0.2
+  gaze_time_shift: 0
+  gaze_direction_mode: recorded
+  checkpoint_freq: 500
+  lr: 0.0001
+
+  # Loss: masked MSE on x0 only
+  lambda_simple: 1.0
+  lambda_obj_trans: 0.0
+  lambda_obj_rot: 0.0
+
+  save_root: outputs/${texthom.exp.name}
+  # Training: null starts from scratch (resumes from save_root if a checkpoint exists).
+  # Testing: path to a checkpoint, e.g. checkpoints/graze_obj0.pth
+  weight_path: null
+  save_name: False
+  test_data_name: ${fold}_test
+  test_batch_size: 32
+  # BPS basis (1,024 points, key "obj") and the 100 MANO vertex ids per hand; see README "Assets"
+  bps_path: assets/bps.pt
+  hand_index_path: assets/part_fps_hand_index_100.npy
+  precompute_bps_correspondence: True
+  bps_correspondence_source: object_mesh # normalized_obj_pc, object_mesh
+  # Inference: MANO fit to the predicted hand points, then contact refinement
+  mano_fit_use_post_opt_losses: True
+  mano_refine_mode: bimart_ramp  # first predicted contact -> end, 5-frame transition
+  mano_fit_post_opt_steps: 300
+  save_raw_point_tokens: False
+  num_test_seeds: 10
+  gaze_part_swap: False
+  gaze_part_swap_labels: benchmark/hot3d_grasp/labels_merged.json
+  gaze_part_swap_include_same: True
+  gaze_part_swap_min_parts: 2
+  # Refinement runs from each hand's first predicted contact through the sequence end.
+  # Without a predicted contact only the final 10 valid frames are refined with a
+  # hand-object contact attraction term.
+  mano_refine_contact_weight: 100.0
+  mano_refine_contact_threshold: 0.02
+  mano_refine_fallback_contact_frames: 10
+  mano_refine_transition_frames: 5

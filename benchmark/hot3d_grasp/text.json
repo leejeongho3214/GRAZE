@@ -1,0 +1,710 @@
+{
+  "grab body of can_tomato_sauce with left hand.": [
+    "Grab body of can_tomato_sauce with left hand.",
+    "Grabbing body of can_tomato_sauce with left hand.",
+    "Left hand grabs body of can_tomato_sauce.",
+    "Body of can_tomato_sauce is grabbed with left hand."
+  ],
+  "grab body of dvd_remote with right hand.": [
+    "Grab body of dvd_remote with right hand.",
+    "Grabbing body of dvd_remote with right hand.",
+    "Right hand grabs body of dvd_remote.",
+    "Body of dvd_remote is grabbed with right hand."
+  ],
+  "grab body of dino_toy with right hand.": [
+    "Grab body of dino_toy with right hand.",
+    "Grabbing body of dino_toy with right hand.",
+    "Right hand grabs body of dino_toy.",
+    "Body of dino_toy is grabbed with right hand."
+  ],
+  "grab body of bottle_ranch with right hand.": [
+    "Grab body of bottle_ranch with right hand.",
+    "Grabbing body of bottle_ranch with right hand.",
+    "Right hand grabs body of bottle_ranch.",
+    "Body of bottle_ranch is grabbed with right hand."
+  ],
+  "grab body of food_waffles with right hand.": [
+    "Grab body of food_waffles with right hand.",
+    "Grabbing body of food_waffles with right hand.",
+    "Right hand grabs body of food_waffles.",
+    "Body of food_waffles is grabbed with right hand."
+  ],
+  "grab handle of spoon_wooden with left hand.": [
+    "Grab handle of spoon_wooden with left hand.",
+    "Grabbing handle of spoon_wooden with left hand.",
+    "Left hand grabs handle of spoon_wooden.",
+    "Handle of spoon_wooden is grabbed with left hand."
+  ],
+  "grab cap of bottle_bbq with left hand.": [
+    "Grab cap of bottle_bbq with left hand.",
+    "Grabbing cap of bottle_bbq with left hand.",
+    "Left hand grabs cap of bottle_bbq.",
+    "Cap of bottle_bbq is grabbed with left hand."
+  ],
+  "grab lid of can_parmesan with right hand.": [
+    "Grab lid of can_parmesan with right hand.",
+    "Grabbing lid of can_parmesan with right hand.",
+    "Right hand grabs lid of can_parmesan.",
+    "Lid of can_parmesan is grabbed with right hand."
+  ],
+  "grab body of food_vegetables with right hand.": [
+    "Grab body of food_vegetables with right hand.",
+    "Grabbing body of food_vegetables with right hand.",
+    "Right hand grabs body of food_vegetables.",
+    "Body of food_vegetables is grabbed with right hand."
+  ],
+  "grab body of holder_black with left hand.": [
+    "Grab body of holder_black with left hand.",
+    "Grabbing body of holder_black with left hand.",
+    "Left hand grabs body of holder_black.",
+    "Body of holder_black is grabbed with left hand."
+  ],
+  "grab rim of mug_white with left hand.": [
+    "Grab rim of mug_white with left hand.",
+    "Grabbing rim of mug_white with left hand.",
+    "Left hand grabs rim of mug_white.",
+    "Rim of mug_white is grabbed with left hand."
+  ],
+  "grab body of holder_black with right hand.": [
+    "Grab body of holder_black with right hand.",
+    "Grabbing body of holder_black with right hand.",
+    "Right hand grabs body of holder_black.",
+    "Body of holder_black is grabbed with right hand."
+  ],
+  "grab handle of spatula_red with right hand.": [
+    "Grab handle of spatula_red with right hand.",
+    "Grabbing handle of spatula_red with right hand.",
+    "Right hand grabs handle of spatula_red.",
+    "Handle of spatula_red is grabbed with right hand."
+  ],
+  "grab rim of vase with left hand.": [
+    "Grab rim of vase with left hand.",
+    "Grabbing rim of vase with left hand.",
+    "Left hand grabs rim of vase.",
+    "Rim of vase is grabbed with left hand."
+  ],
+  "grab handle of mug_white with right hand.": [
+    "Grab handle of mug_white with right hand.",
+    "Grabbing handle of mug_white with right hand.",
+    "Right hand grabs handle of mug_white.",
+    "Handle of mug_white is grabbed with right hand."
+  ],
+  "grab top of bottle_mustard with left hand.": [
+    "Grab top of bottle_mustard with left hand.",
+    "Grabbing top of bottle_mustard with left hand.",
+    "Left hand grabs top of bottle_mustard.",
+    "Top of bottle_mustard is grabbed with left hand."
+  ],
+  "grab cap of whiteboard_marker with left hand.": [
+    "Grab cap of whiteboard_marker with left hand.",
+    "Grabbing cap of whiteboard_marker with left hand.",
+    "Left hand grabs cap of whiteboard_marker.",
+    "Cap of whiteboard_marker is grabbed with left hand."
+  ],
+  "grab body of puzzle_toy with right hand.": [
+    "Grab body of puzzle_toy with right hand.",
+    "Grabbing body of puzzle_toy with right hand.",
+    "Right hand grabs body of puzzle_toy.",
+    "Body of puzzle_toy is grabbed with right hand."
+  ],
+  "grab cap of bottle_ranch with right hand.": [
+    "Grab cap of bottle_ranch with right hand.",
+    "Grabbing cap of bottle_ranch with right hand.",
+    "Right hand grabs cap of bottle_ranch.",
+    "Cap of bottle_ranch is grabbed with right hand."
+  ],
+  "grab body of bottle_mustard with right hand.": [
+    "Grab body of bottle_mustard with right hand.",
+    "Grabbing body of bottle_mustard with right hand.",
+    "Right hand grabs body of bottle_mustard.",
+    "Body of bottle_mustard is grabbed with right hand."
+  ],
+  "grab edge of plate_bamboo with right hand.": [
+    "Grab edge of plate_bamboo with right hand.",
+    "Grabbing edge of plate_bamboo with right hand.",
+    "Right hand grabs edge of plate_bamboo.",
+    "Edge of plate_bamboo is grabbed with right hand."
+  ],
+  "grab body of bottle_mustard with left hand.": [
+    "Grab body of bottle_mustard with left hand.",
+    "Grabbing body of bottle_mustard with left hand.",
+    "Left hand grabs body of bottle_mustard.",
+    "Body of bottle_mustard is grabbed with left hand."
+  ],
+  "grab head of dino_toy with left hand.": [
+    "Grab head of dino_toy with left hand.",
+    "Grabbing head of dino_toy with left hand.",
+    "Left hand grabs head of dino_toy.",
+    "Head of dino_toy is grabbed with left hand."
+  ],
+  "grab rim of flask with left hand.": [
+    "Grab rim of flask with left hand.",
+    "Grabbing rim of flask with left hand.",
+    "Left hand grabs rim of flask.",
+    "Rim of flask is grabbed with left hand."
+  ],
+  "grab body of carton_milk with right hand.": [
+    "Grab body of carton_milk with right hand.",
+    "Grabbing body of carton_milk with right hand.",
+    "Right hand grabs body of carton_milk.",
+    "Body of carton_milk is grabbed with right hand."
+  ],
+  "grab short edge of whiteboard_eraser with right hand.": [
+    "Grab short edge of whiteboard_eraser with right hand.",
+    "Grabbing short edge of whiteboard_eraser with right hand.",
+    "Right hand grabs short edge of whiteboard_eraser.",
+    "Short edge of whiteboard_eraser is grabbed with right hand."
+  ],
+  "grab body of mouse with right hand.": [
+    "Grab body of mouse with right hand.",
+    "Grabbing body of mouse with right hand.",
+    "Right hand grabs body of mouse.",
+    "Body of mouse is grabbed with right hand."
+  ],
+  "grab rim of flask with right hand.": [
+    "Grab rim of flask with right hand.",
+    "Grabbing rim of flask with right hand.",
+    "Right hand grabs rim of flask.",
+    "Rim of flask is grabbed with right hand."
+  ],
+  "grab body of birdhouse_toy with right hand.": [
+    "Grab body of birdhouse_toy with right hand.",
+    "Grabbing body of birdhouse_toy with right hand.",
+    "Right hand grabs body of birdhouse_toy.",
+    "Body of birdhouse_toy is grabbed with right hand."
+  ],
+  "grab body of can_soup with left hand.": [
+    "Grab body of can_soup with left hand.",
+    "Grabbing body of can_soup with left hand.",
+    "Left hand grabs body of can_soup.",
+    "Body of can_soup is grabbed with left hand."
+  ],
+  "grab rim of coffee_pot with left hand.": [
+    "Grab rim of coffee_pot with left hand.",
+    "Grabbing rim of coffee_pot with left hand.",
+    "Left hand grabs rim of coffee_pot.",
+    "Rim of coffee_pot is grabbed with left hand."
+  ],
+  "grab body of flask with right hand.": [
+    "Grab body of flask with right hand.",
+    "Grabbing body of flask with right hand.",
+    "Right hand grabs body of flask.",
+    "Body of flask is grabbed with right hand."
+  ],
+  "grab body of whiteboard_marker with right hand.": [
+    "Grab body of whiteboard_marker with right hand.",
+    "Grabbing body of whiteboard_marker with right hand.",
+    "Right hand grabs body of whiteboard_marker.",
+    "Body of whiteboard_marker is grabbed with right hand."
+  ],
+  "grab rim of can_soup with right hand.": [
+    "Grab rim of can_soup with right hand.",
+    "Grabbing rim of can_soup with right hand.",
+    "Right hand grabs rim of can_soup.",
+    "Rim of can_soup is grabbed with right hand."
+  ],
+  "grab rim of bowl with both hands.": [
+    "Grab rim of bowl with both hands.",
+    "Grabbing rim of bowl with both hands.",
+    "Both hands grabs rim of bowl.",
+    "Rim of bowl is grabbed with both hands."
+  ],
+  "grab body of holder_gray with right hand.": [
+    "Grab body of holder_gray with right hand.",
+    "Grabbing body of holder_gray with right hand.",
+    "Right hand grabs body of holder_gray.",
+    "Body of holder_gray is grabbed with right hand."
+  ],
+  "grab handle of potato_masher with left hand.": [
+    "Grab handle of potato_masher with left hand.",
+    "Grabbing handle of potato_masher with left hand.",
+    "Left hand grabs handle of potato_masher.",
+    "Handle of potato_masher is grabbed with left hand."
+  ],
+  "grab body of vase with left hand.": [
+    "Grab body of vase with left hand.",
+    "Grabbing body of vase with left hand.",
+    "Left hand grabs body of vase.",
+    "Body of vase is grabbed with left hand."
+  ],
+  "grab handle of potato_masher with right hand.": [
+    "Grab handle of potato_masher with right hand.",
+    "Grabbing handle of potato_masher with right hand.",
+    "Right hand grabs handle of potato_masher.",
+    "Handle of potato_masher is grabbed with right hand."
+  ],
+  "grab body of food_vegetables with left hand.": [
+    "Grab body of food_vegetables with left hand.",
+    "Grabbing body of food_vegetables with left hand.",
+    "Left hand grabs body of food_vegetables.",
+    "Body of food_vegetables is grabbed with left hand."
+  ],
+  "grab handle of flask with right hand.": [
+    "Grab handle of flask with right hand.",
+    "Grabbing handle of flask with right hand.",
+    "Right hand grabs handle of flask.",
+    "Handle of flask is grabbed with right hand."
+  ],
+  "grab bridge of aria_small with left hand.": [
+    "Grab bridge of aria_small with left hand.",
+    "Grabbing bridge of aria_small with left hand.",
+    "Left hand grabs bridge of aria_small.",
+    "Bridge of aria_small is grabbed with left hand."
+  ],
+  "grab roof of birdhouse_toy with right hand.": [
+    "Grab roof of birdhouse_toy with right hand.",
+    "Grabbing roof of birdhouse_toy with right hand.",
+    "Right hand grabs roof of birdhouse_toy.",
+    "Roof of birdhouse_toy is grabbed with right hand."
+  ],
+  "grab handle of mug_white with left hand.": [
+    "Grab handle of mug_white with left hand.",
+    "Grabbing handle of mug_white with left hand.",
+    "Left hand grabs handle of mug_white.",
+    "Handle of mug_white is grabbed with left hand."
+  ],
+  "grab center of dumbbell_5lb with left hand.": [
+    "Grab center of dumbbell_5lb with left hand.",
+    "Grabbing center of dumbbell_5lb with left hand.",
+    "Left hand grabs center of dumbbell_5lb.",
+    "Center of dumbbell_5lb is grabbed with left hand."
+  ],
+  "grab tail of dino_toy with right hand.": [
+    "Grab tail of dino_toy with right hand.",
+    "Grabbing tail of dino_toy with right hand.",
+    "Right hand grabs tail of dino_toy.",
+    "Tail of dino_toy is grabbed with right hand."
+  ],
+  "grab body of mouse with left hand.": [
+    "Grab body of mouse with left hand.",
+    "Grabbing body of mouse with left hand.",
+    "Left hand grabs body of mouse.",
+    "Body of mouse is grabbed with left hand."
+  ],
+  "grab body of vase with right hand.": [
+    "Grab body of vase with right hand.",
+    "Grabbing body of vase with right hand.",
+    "Right hand grabs body of vase.",
+    "Body of vase is grabbed with right hand."
+  ],
+  "grab short edge of whiteboard_eraser with left hand.": [
+    "Grab short edge of whiteboard_eraser with left hand.",
+    "Grabbing short edge of whiteboard_eraser with left hand.",
+    "Left hand grabs short edge of whiteboard_eraser.",
+    "Short edge of whiteboard_eraser is grabbed with left hand."
+  ],
+  "grab rim of coffee_pot with right hand.": [
+    "Grab rim of coffee_pot with right hand.",
+    "Grabbing rim of coffee_pot with right hand.",
+    "Right hand grabs rim of coffee_pot.",
+    "Rim of coffee_pot is grabbed with right hand."
+  ],
+  "grab long edge of whiteboard_eraser with right hand.": [
+    "Grab long edge of whiteboard_eraser with right hand.",
+    "Grabbing long edge of whiteboard_eraser with right hand.",
+    "Right hand grabs long edge of whiteboard_eraser.",
+    "Long edge of whiteboard_eraser is grabbed with right hand."
+  ],
+  "grab body of can_soup with right hand.": [
+    "Grab body of can_soup with right hand.",
+    "Grabbing body of can_soup with right hand.",
+    "Right hand grabs body of can_soup.",
+    "Body of can_soup is grabbed with right hand."
+  ],
+  "grab rim of holder_gray with right hand.": [
+    "Grab rim of holder_gray with right hand.",
+    "Grabbing rim of holder_gray with right hand.",
+    "Right hand grabs rim of holder_gray.",
+    "Rim of holder_gray is grabbed with right hand."
+  ],
+  "grab roof of birdhouse_toy with left hand.": [
+    "Grab roof of birdhouse_toy with left hand.",
+    "Grabbing roof of birdhouse_toy with left hand.",
+    "Left hand grabs roof of birdhouse_toy.",
+    "Roof of birdhouse_toy is grabbed with left hand."
+  ],
+  "grab body of dvd_remote with left hand.": [
+    "Grab body of dvd_remote with left hand.",
+    "Grabbing body of dvd_remote with left hand.",
+    "Left hand grabs body of dvd_remote.",
+    "Body of dvd_remote is grabbed with left hand."
+  ],
+  "grab rim of mug_patterned with left hand.": [
+    "Grab rim of mug_patterned with left hand.",
+    "Grabbing rim of mug_patterned with left hand.",
+    "Left hand grabs rim of mug_patterned.",
+    "Rim of mug_patterned is grabbed with left hand."
+  ],
+  "grab bottom of carton_oj with right hand.": [
+    "Grab bottom of carton_oj with right hand.",
+    "Grabbing bottom of carton_oj with right hand.",
+    "Right hand grabs bottom of carton_oj.",
+    "Bottom of carton_oj is grabbed with right hand."
+  ],
+  "grab handle of mug_patterned with left hand.": [
+    "Grab handle of mug_patterned with left hand.",
+    "Grabbing handle of mug_patterned with left hand.",
+    "Left hand grabs handle of mug_patterned.",
+    "Handle of mug_patterned is grabbed with left hand."
+  ],
+  "grab bottom of carton_milk with right hand.": [
+    "Grab bottom of carton_milk with right hand.",
+    "Grabbing bottom of carton_milk with right hand.",
+    "Right hand grabs bottom of carton_milk.",
+    "Bottom of carton_milk is grabbed with right hand."
+  ],
+  "grab body of coffee_pot with right hand.": [
+    "Grab body of coffee_pot with right hand.",
+    "Grabbing body of coffee_pot with right hand.",
+    "Right hand grabs body of coffee_pot.",
+    "Body of coffee_pot is grabbed with right hand."
+  ],
+  "grab edge of plate_bamboo with both hands.": [
+    "Grab edge of plate_bamboo with both hands.",
+    "Grabbing edge of plate_bamboo with both hands.",
+    "Both hands grabs edge of plate_bamboo.",
+    "Edge of plate_bamboo is grabbed with both hands."
+  ],
+  "grab lid of can_parmesan with left hand.": [
+    "Grab lid of can_parmesan with left hand.",
+    "Grabbing lid of can_parmesan with left hand.",
+    "Left hand grabs lid of can_parmesan.",
+    "Lid of can_parmesan is grabbed with left hand."
+  ],
+  "grab body of dino_toy with left hand.": [
+    "Grab body of dino_toy with left hand.",
+    "Grabbing body of dino_toy with left hand.",
+    "Left hand grabs body of dino_toy.",
+    "Body of dino_toy is grabbed with left hand."
+  ],
+  "grab body of carton_oj with left hand.": [
+    "Grab body of carton_oj with left hand.",
+    "Grabbing body of carton_oj with left hand.",
+    "Left hand grabs body of carton_oj.",
+    "Body of carton_oj is grabbed with left hand."
+  ],
+  "grab body of food_waffles with left hand.": [
+    "Grab body of food_waffles with left hand.",
+    "Grabbing body of food_waffles with left hand.",
+    "Left hand grabs body of food_waffles.",
+    "Body of food_waffles is grabbed with left hand."
+  ],
+  "grab cap of bottle_ranch with left hand.": [
+    "Grab cap of bottle_ranch with left hand.",
+    "Grabbing cap of bottle_ranch with left hand.",
+    "Left hand grabs cap of bottle_ranch.",
+    "Cap of bottle_ranch is grabbed with left hand."
+  ],
+  "grab body of mug_white with left hand.": [
+    "Grab body of mug_white with left hand.",
+    "Grabbing body of mug_white with left hand.",
+    "Left hand grabs body of mug_white.",
+    "Body of mug_white is grabbed with left hand."
+  ],
+  "grab top of carton_milk with left hand.": [
+    "Grab top of carton_milk with left hand.",
+    "Grabbing top of carton_milk with left hand.",
+    "Left hand grabs top of carton_milk.",
+    "Top of carton_milk is grabbed with left hand."
+  ],
+  "grab rim of vase with right hand.": [
+    "Grab rim of vase with right hand.",
+    "Grabbing rim of vase with right hand.",
+    "Right hand grabs rim of vase.",
+    "Rim of vase is grabbed with right hand."
+  ],
+  "grab body of whiteboard_marker with left hand.": [
+    "Grab body of whiteboard_marker with left hand.",
+    "Grabbing body of whiteboard_marker with left hand.",
+    "Left hand grabs body of whiteboard_marker.",
+    "Body of whiteboard_marker is grabbed with left hand."
+  ],
+  "grab body of mug_patterned with right hand.": [
+    "Grab body of mug_patterned with right hand.",
+    "Grabbing body of mug_patterned with right hand.",
+    "Right hand grabs body of mug_patterned.",
+    "Body of mug_patterned is grabbed with right hand."
+  ],
+  "grab handle of spoon_wooden with right hand.": [
+    "Grab handle of spoon_wooden with right hand.",
+    "Grabbing handle of spoon_wooden with right hand.",
+    "Right hand grabs handle of spoon_wooden.",
+    "Handle of spoon_wooden is grabbed with right hand."
+  ],
+  "grab body of holder_gray with left hand.": [
+    "Grab body of holder_gray with left hand.",
+    "Grabbing body of holder_gray with left hand.",
+    "Left hand grabs body of holder_gray.",
+    "Body of holder_gray is grabbed with left hand."
+  ],
+  "grab roof of birdhouse_toy with both hands.": [
+    "Grab roof of birdhouse_toy with both hands.",
+    "Grabbing roof of birdhouse_toy with both hands.",
+    "Both hands grabs roof of birdhouse_toy.",
+    "Roof of birdhouse_toy is grabbed with both hands."
+  ],
+  "grab rim of holder_gray with left hand.": [
+    "Grab rim of holder_gray with left hand.",
+    "Grabbing rim of holder_gray with left hand.",
+    "Left hand grabs rim of holder_gray.",
+    "Rim of holder_gray is grabbed with left hand."
+  ],
+  "grab handle of spatula_red with left hand.": [
+    "Grab handle of spatula_red with left hand.",
+    "Grabbing handle of spatula_red with left hand.",
+    "Left hand grabs handle of spatula_red.",
+    "Handle of spatula_red is grabbed with left hand."
+  ],
+  "grab body of can_parmesan with left hand.": [
+    "Grab body of can_parmesan with left hand.",
+    "Grabbing body of can_parmesan with left hand.",
+    "Left hand grabs body of can_parmesan.",
+    "Body of can_parmesan is grabbed with left hand."
+  ],
+  "grab body of mug_patterned with left hand.": [
+    "Grab body of mug_patterned with left hand.",
+    "Grabbing body of mug_patterned with left hand.",
+    "Left hand grabs body of mug_patterned.",
+    "Body of mug_patterned is grabbed with left hand."
+  ],
+  "grab rim of can_tomato_sauce with left hand.": [
+    "Grab rim of can_tomato_sauce with left hand.",
+    "Grabbing rim of can_tomato_sauce with left hand.",
+    "Left hand grabs rim of can_tomato_sauce.",
+    "Rim of can_tomato_sauce is grabbed with left hand."
+  ],
+  "grab handle of vase with right hand.": [
+    "Grab handle of vase with right hand.",
+    "Grabbing handle of vase with right hand.",
+    "Right hand grabs handle of vase.",
+    "Handle of vase is grabbed with right hand."
+  ],
+  "grab body of carton_milk with left hand.": [
+    "Grab body of carton_milk with left hand.",
+    "Grabbing body of carton_milk with left hand.",
+    "Left hand grabs body of carton_milk.",
+    "Body of carton_milk is grabbed with left hand."
+  ],
+  "grab body of bowl with both hands.": [
+    "Grab body of bowl with both hands.",
+    "Grabbing body of bowl with both hands.",
+    "Both hands grabs body of bowl.",
+    "Body of bowl is grabbed with both hands."
+  ],
+  "grab top of bottle_mustard with right hand.": [
+    "Grab top of bottle_mustard with right hand.",
+    "Grabbing top of bottle_mustard with right hand.",
+    "Right hand grabs top of bottle_mustard.",
+    "Top of bottle_mustard is grabbed with right hand."
+  ],
+  "grab body of puzzle_toy with left hand.": [
+    "Grab body of puzzle_toy with left hand.",
+    "Grabbing body of puzzle_toy with left hand.",
+    "Left hand grabs body of puzzle_toy.",
+    "Body of puzzle_toy is grabbed with left hand."
+  ],
+  "grab center of dumbbell_5lb with right hand.": [
+    "Grab center of dumbbell_5lb with right hand.",
+    "Grabbing center of dumbbell_5lb with right hand.",
+    "Right hand grabs center of dumbbell_5lb.",
+    "Center of dumbbell_5lb is grabbed with right hand."
+  ],
+  "grab rim of mug_patterned with right hand.": [
+    "Grab rim of mug_patterned with right hand.",
+    "Grabbing rim of mug_patterned with right hand.",
+    "Right hand grabs rim of mug_patterned.",
+    "Rim of mug_patterned is grabbed with right hand."
+  ],
+  "grab body of coffee_pot with left hand.": [
+    "Grab body of coffee_pot with left hand.",
+    "Grabbing body of coffee_pot with left hand.",
+    "Left hand grabs body of coffee_pot.",
+    "Body of coffee_pot is grabbed with left hand."
+  ],
+  "grab rim of can_tomato_sauce with right hand.": [
+    "Grab rim of can_tomato_sauce with right hand.",
+    "Grabbing rim of can_tomato_sauce with right hand.",
+    "Right hand grabs rim of can_tomato_sauce.",
+    "Rim of can_tomato_sauce is grabbed with right hand."
+  ],
+  "grab body of bottle_bbq with left hand.": [
+    "Grab body of bottle_bbq with left hand.",
+    "Grabbing body of bottle_bbq with left hand.",
+    "Left hand grabs body of bottle_bbq.",
+    "Body of bottle_bbq is grabbed with left hand."
+  ],
+  "grab handle of coffee_pot with right hand.": [
+    "Grab handle of coffee_pot with right hand.",
+    "Grabbing handle of coffee_pot with right hand.",
+    "Right hand grabs handle of coffee_pot.",
+    "Handle of coffee_pot is grabbed with right hand."
+  ],
+  "grab cap of bottle_bbq with right hand.": [
+    "Grab cap of bottle_bbq with right hand.",
+    "Grabbing cap of bottle_bbq with right hand.",
+    "Right hand grabs cap of bottle_bbq.",
+    "Cap of bottle_bbq is grabbed with right hand."
+  ],
+  "grab body of carton_oj with right hand.": [
+    "Grab body of carton_oj with right hand.",
+    "Grabbing body of carton_oj with right hand.",
+    "Right hand grabs body of carton_oj.",
+    "Body of carton_oj is grabbed with right hand."
+  ],
+  "grab body of can_tomato_sauce with right hand.": [
+    "Grab body of can_tomato_sauce with right hand.",
+    "Grabbing body of can_tomato_sauce with right hand.",
+    "Right hand grabs body of can_tomato_sauce.",
+    "Body of can_tomato_sauce is grabbed with right hand."
+  ],
+  "grab rim of can_soup with left hand.": [
+    "Grab rim of can_soup with left hand.",
+    "Grabbing rim of can_soup with left hand.",
+    "Left hand grabs rim of can_soup.",
+    "Rim of can_soup is grabbed with left hand."
+  ],
+  "grab body of bottle_ranch with left hand.": [
+    "Grab body of bottle_ranch with left hand.",
+    "Grabbing body of bottle_ranch with left hand.",
+    "Left hand grabs body of bottle_ranch.",
+    "Body of bottle_ranch is grabbed with left hand."
+  ],
+  "grab top of carton_oj with right hand.": [
+    "Grab top of carton_oj with right hand.",
+    "Grabbing top of carton_oj with right hand.",
+    "Right hand grabs top of carton_oj.",
+    "Top of carton_oj is grabbed with right hand."
+  ],
+  "grab bridge of aria_small with right hand.": [
+    "Grab bridge of aria_small with right hand.",
+    "Grabbing bridge of aria_small with right hand.",
+    "Right hand grabs bridge of aria_small.",
+    "Bridge of aria_small is grabbed with right hand."
+  ],
+  "grab body of mug_white with right hand.": [
+    "Grab body of mug_white with right hand.",
+    "Grabbing body of mug_white with right hand.",
+    "Right hand grabs body of mug_white.",
+    "Body of mug_white is grabbed with right hand."
+  ],
+  "grab rim of mug_white with right hand.": [
+    "Grab rim of mug_white with right hand.",
+    "Grabbing rim of mug_white with right hand.",
+    "Right hand grabs rim of mug_white.",
+    "Rim of mug_white is grabbed with right hand."
+  ],
+  "grab frame of aria_small with left hand.": [
+    "Grab frame of aria_small with left hand.",
+    "Grabbing frame of aria_small with left hand.",
+    "Left hand grabs frame of aria_small.",
+    "Frame of aria_small is grabbed with left hand."
+  ],
+  "grab long edge of whiteboard_eraser with left hand.": [
+    "Grab long edge of whiteboard_eraser with left hand.",
+    "Grabbing long edge of whiteboard_eraser with left hand.",
+    "Left hand grabs long edge of whiteboard_eraser.",
+    "Long edge of whiteboard_eraser is grabbed with left hand."
+  ],
+  "grab rim of holder_black with right hand.": [
+    "Grab rim of holder_black with right hand.",
+    "Grabbing rim of holder_black with right hand.",
+    "Right hand grabs rim of holder_black.",
+    "Rim of holder_black is grabbed with right hand."
+  ],
+  "grab handle of flask with left hand.": [
+    "Grab handle of flask with left hand.",
+    "Grabbing handle of flask with left hand.",
+    "Left hand grabs handle of flask.",
+    "Handle of flask is grabbed with left hand."
+  ],
+  "grab body of flask with left hand.": [
+    "Grab body of flask with left hand.",
+    "Grabbing body of flask with left hand.",
+    "Left hand grabs body of flask.",
+    "Body of flask is grabbed with left hand."
+  ],
+  "grab rim of bowl with left hand.": [
+    "Grab rim of bowl with left hand.",
+    "Grabbing rim of bowl with left hand.",
+    "Left hand grabs rim of bowl.",
+    "Rim of bowl is grabbed with left hand."
+  ],
+  "grab handle of mug_patterned with right hand.": [
+    "Grab handle of mug_patterned with right hand.",
+    "Grabbing handle of mug_patterned with right hand.",
+    "Right hand grabs handle of mug_patterned.",
+    "Handle of mug_patterned is grabbed with right hand."
+  ],
+  "grab cap of whiteboard_marker with right hand.": [
+    "Grab cap of whiteboard_marker with right hand.",
+    "Grabbing cap of whiteboard_marker with right hand.",
+    "Right hand grabs cap of whiteboard_marker.",
+    "Cap of whiteboard_marker is grabbed with right hand."
+  ],
+  "grab handle of vase with left hand.": [
+    "Grab handle of vase with left hand.",
+    "Grabbing handle of vase with left hand.",
+    "Left hand grabs handle of vase.",
+    "Handle of vase is grabbed with left hand."
+  ],
+  "grab bottom of carton_milk with left hand.": [
+    "Grab bottom of carton_milk with left hand.",
+    "Grabbing bottom of carton_milk with left hand.",
+    "Left hand grabs bottom of carton_milk.",
+    "Bottom of carton_milk is grabbed with left hand."
+  ],
+  "grab top of carton_oj with left hand.": [
+    "Grab top of carton_oj with left hand.",
+    "Grabbing top of carton_oj with left hand.",
+    "Left hand grabs top of carton_oj.",
+    "Top of carton_oj is grabbed with left hand."
+  ],
+  "grab body of birdhouse_toy with both hands.": [
+    "Grab body of birdhouse_toy with both hands.",
+    "Grabbing body of birdhouse_toy with both hands.",
+    "Both hands grabs body of birdhouse_toy.",
+    "Body of birdhouse_toy is grabbed with both hands."
+  ],
+  "grab edge of plate_bamboo with left hand.": [
+    "Grab edge of plate_bamboo with left hand.",
+    "Grabbing edge of plate_bamboo with left hand.",
+    "Left hand grabs edge of plate_bamboo.",
+    "Edge of plate_bamboo is grabbed with left hand."
+  ],
+  "grab top of carton_milk with right hand.": [
+    "Grab top of carton_milk with right hand.",
+    "Grabbing top of carton_milk with right hand.",
+    "Right hand grabs top of carton_milk.",
+    "Top of carton_milk is grabbed with right hand."
+  ],
+  "grab frame of aria_small with right hand.": [
+    "Grab frame of aria_small with right hand.",
+    "Grabbing frame of aria_small with right hand.",
+    "Right hand grabs frame of aria_small.",
+    "Frame of aria_small is grabbed with right hand."
+  ],
+  "grab handle of coffee_pot with left hand.": [
+    "Grab handle of coffee_pot with left hand.",
+    "Grabbing handle of coffee_pot with left hand.",
+    "Left hand grabs handle of coffee_pot.",
+    "Handle of coffee_pot is grabbed with left hand."
+  ],
+  "grab rim of bowl with right hand.": [
+    "Grab rim of bowl with right hand.",
+    "Grabbing rim of bowl with right hand.",
+    "Right hand grabs rim of bowl.",
+    "Rim of bowl is grabbed with right hand."
+  ],
+  "grab body of bottle_bbq with right hand.": [
+    "Grab body of bottle_bbq with right hand.",
+    "Grabbing body of bottle_bbq with right hand.",
+    "Right hand grabs body of bottle_bbq.",
+    "Body of bottle_bbq is grabbed with right hand."
+  ],
+  "grab body of can_parmesan with right hand.": [
+    "Grab body of can_parmesan with right hand.",
+    "Grabbing body of can_parmesan with right hand.",
+    "Right hand grabs body of can_parmesan.",
+    "Body of can_parmesan is grabbed with right hand."
+  ]
+}

@@ -1,0 +1,22 @@
+# data, assets and outputs are never committed (see README)
+/data
+/assets/*
+!/assets/README.md
+/checkpoints/*
+!/checkpoints/README.md
+!/checkpoints/SHA256SUMS
+/outputs/
+/results/
+/cache/
+/wandb/
+__pycache__/
+*.pyc
+*.pth
+*.pt
+*.pkl
+!benchmark/**
+.vscode/
+.idea/
+.envrc
+.venv/
+/eval/data/

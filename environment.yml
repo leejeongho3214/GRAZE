@@ -1,0 +1,18 @@
+name: graze
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - pytorch=1.13.0
+  - torchvision=0.14.0
+  - pytorch-cuda=11.6
+  - pip
+  - pip:
+      - -r requirements.txt
+# pytorch3d 0.7.2: install afterwards, e.g.
+#   conda install -c fvcore -c iopath -c conda-forge fvcore iopath
+#   conda install -c pytorch3d pytorch3d=0.7.2
+# or build from source: https://github.com/facebookresearch/pytorch3d/blob/main/INSTALL.md

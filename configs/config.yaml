@@ -1,0 +1,37 @@
+hydra:
+  run:
+    dir: .          # keep the working directory
+  sweep:
+    dir: .
+    subdir: .
+  output_subdir: null
+  job:
+    chdir: false
+
+defaults:
+  - _self_
+  - dataset: hot3d
+  - clip: clip
+  - diffusion: diffusion
+  - pointfeat: pointfeat
+  - contact: contact
+  - texthom: texthom
+  - override hydra/job_logging: disabled
+  - override hydra/hydra_logging: disabled
+
+# HOT3D-Grasp object fold: obj0 | obj1 | obj2 (sets data split and experiment name)
+fold: obj0
+
+batch_size: 64
+shuffle: True
+drop_last: True
+num_workers: 4
+result_show_freq: 500
+save_pth_freq: 2000
+text: ["hook handle of Mug_white with right hand"]
+balance_weights: True
+test: False
+reset: False
+use_best_weight: False
+# Weights & Biases logging (off by default; set true after `wandb login`)
+use_wandb: False
