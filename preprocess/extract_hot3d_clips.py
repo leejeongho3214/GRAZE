@@ -2,8 +2,23 @@
 
 For every annotated grasp action (one row of benchmark/hot3d_grasp/clip_annotations.csv) it reads
 frames [grasping_start, grasping_end) of the HOT3D sequence and stores, per frame, the target object
-pose, the poses of all scene objects, both MANO hands (124-d: flag, wrist translation, full pose,
-betas per hand), the RGB camera extrinsics and the eye-gaze ray in world coordinates.
+pose, the poses of all scene objects, both MANO hands (124-d: flag, wrist translation, 48-d axis-angle
+pose, betas per hand), the RGB camera extrinsics and the eye-gaze ray in world coordinates.
+
+Hand-pose convention. The 48-d pose of each hand is [global_orient (3), hand_pose (45)] where
+hand_pose is the 45-d finger pose WITHOUT the MANO mean pose (`hands_mean`), i.e. smplx's
+`mano_output.hand_pose`. The toolkit's smplx MANO layer uses flat_hand_mean=False, so its
+`full_pose` already contains `hands_mean`. Downstream, preprocessing_hot3d.py feeds these poses to
+build_mano_aa(flat_hand=False), which adds `hands_mean` once. This is the convention of the
+extraction the paper's splits were built with.
+
+Frames for which a hand / object / headset pose or the gaze is missing are dropped (the clip gets
+shorter), as in the paper's extraction.
+
+Two options reproduce a later (Jun-8) variant of this script that was NOT used for the paper's
+splits: --keep_hand_mean stores smplx `full_pose` (mean included; downstream then adds the mean a
+second time, about 2.8 cm joint error) and --fill_single_frame_gaps replaces a single missing frame
+by a copy of an adjacent frame (62 frames in 61 actions). Do not use them to rebuild the benchmark.
 
 Needs the HOT3D toolkit (https://github.com/facebookresearch/hot3d, commit aae496b) with
 preprocess/hot3d_toolkit.patch applied (it makes the MANO layer return the full pose), and
@@ -34,6 +49,12 @@ _parser.add_argument("--annotations", default=os.path.join(_PROJECT_ROOT, "bench
 _parser.add_argument("--out", default=os.path.join(_PROJECT_ROOT, "data/hot3d/data/acc_ori.pkl"))
 _parser.add_argument("--sequences", nargs="*", default=None,
                      help="only process these sequence IDs (for testing; default: all annotated sequences)")
+_parser.add_argument("--keep_hand_mean", action="store_true",
+                     help="Jun-8 variant, not used for the paper: store smplx full_pose (MANO hands_mean "
+                          "included) instead of the mean-free hand_pose")
+_parser.add_argument("--fill_single_frame_gaps", action="store_true",
+                     help="Jun-8 variant, not used for the paper: replace a single missing frame by a copy "
+                          "of an adjacent valid frame instead of dropping it")
 _args = _parser.parse_args()
 if _args.hot3d_toolkit is not None:
     sys.path.insert(0, os.path.abspath(_args.hot3d_toolkit))
@@ -178,6 +199,22 @@ def to_numpy(value):
     if hasattr(value, "detach"):
         return value.detach().cpu().numpy()
     return np.array(value)
+
+
+def mano_pose_48(mano_output):
+    """48-d axis-angle pose [global_orient, hand_pose] of one hand from a smplx MANO output.
+
+    Default (paper convention): the 45-d finger pose is smplx's `hand_pose`, i.e. WITHOUT the MANO
+    mean pose. smplx computes full_pose = cat(global_orient, hand_pose) + pose_mean, where pose_mean
+    is zero for global_orient and `hands_mean` for the fingers (flat_hand_mean=False in the toolkit).
+    With --keep_hand_mean (Jun-8 variant, not used for the paper) `full_pose` is stored instead.
+    """
+    full_pose = to_numpy(mano_output.full_pose).flatten()
+    if _args.keep_hand_mean:
+        return full_pose
+    hand_pose = to_numpy(mano_output.hand_pose).flatten()
+    assert full_pose.shape == (48,) and hand_pose.shape == (45,), (full_pose.shape, hand_pose.shape)
+    return np.concatenate([full_pose[:3], hand_pose])
 
 
 def assert_finite(name, value, seq_name, obj_name, action_id, frame_index, hand=None):
@@ -353,7 +390,7 @@ for seq_name, seq_data in tqdm(annotations.items()):
                 # Skeleton/Joints landmark representation (for LEFT hand)
                 if hand_pose_data.is_left_hand():
                     hand_mesh_vertices, landmarks, mano_output, _ = hand_data_provider.get_hand_mesh_vertices(hand_pose_data)
-                    full_pose = to_numpy(mano_output.full_pose).flatten()
+                    full_pose = mano_pose_48(mano_output)
                     hand_transl = np.asarray(
                         hand_pose_data.wrist_pose.to_matrix()[:3, 3], dtype=np.float64
                     )
@@ -367,7 +404,7 @@ for seq_name, seq_data in tqdm(annotations.items()):
                     
                 if hand_pose_data.is_right_hand():
                     hand_mesh_vertices, landmarks, _, mano_output = hand_data_provider.get_hand_mesh_vertices(hand_pose_data)
-                    full_pose = to_numpy(mano_output.full_pose).flatten()
+                    full_pose = mano_pose_48(mano_output)
                     hand_transl = np.asarray(
                         hand_pose_data.wrist_pose.to_matrix()[:3, 3], dtype=np.float64
                     )
@@ -488,7 +525,9 @@ for seq_name, seq_data in tqdm(annotations.items()):
                 i += 1
             run_end = i
             run_length = run_end - run_start
-            if run_length != 1:
+            if run_length != 1 or not _args.fill_single_frame_gaps:
+                # missing frames are dropped (paper convention); only with --fill_single_frame_gaps
+                # is a single missing frame replaced by a copy of an adjacent frame
                 continue
 
             fill_source = None
@@ -552,7 +591,8 @@ with open(os.path.join(save_folder, f"{save_name}"), "wb") as f:
 
 print(f"Data saved successfully. {save_folder}/{save_name}")
 if missing_data_reasons:
-    print("Summary of missing data by reason before one-frame filling:")
+    print("Summary of missing data by reason (missing frames are dropped"
+          + (", single-frame gaps filled" if _args.fill_single_frame_gaps else "") + "):")
     for reason, action_ids in missing_data_reasons.items():
         message = reason_messages.get(reason, reason)
         print(f"{message}: {sorted(action_ids)}")

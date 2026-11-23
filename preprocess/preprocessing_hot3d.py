@@ -483,6 +483,38 @@ with open(osp.join(PROJECT_ROOT, "data/hot3d/previous/instance.json"), "r") as f
     instance_ = json.load(f)
 
 
+def check_hand_pose_convention(data, left_hand_mean, right_hand_mean):
+    """Refuse finger poses that already contain the MANO mean pose.
+
+    Over all frames with an active hand, the average finger pose of mean-free poses lies close to
+    zero (|mean| about 0.7-0.8 rad on HOT3D) and far from `hands_mean` (about 2.6-2.7), while poses
+    that include the mean show the opposite (about 2.2-2.3 vs 0.7-0.8).
+    """
+    for name, flag_col, sl, hand_mean in (
+        ("left", 0, slice(7, 52), left_hand_mean),
+        ("right", 62, slice(69, 114), right_hand_mean),
+    ):
+        poses = []
+        for value_list in data.values():
+            for frames in value_list["hand_pose_manos"]:
+                frames = np.asarray(frames, dtype=np.float64)
+                if frames.size:
+                    poses.append(frames[frames[:, flag_col] == 1][:, sl])
+        poses = np.concatenate(poses) if poses else np.zeros((0, 45))
+        if len(poses) == 0:
+            continue
+        mean_pose = poses.mean(0)
+        dist_zero = float(np.linalg.norm(mean_pose))
+        dist_mean = float(np.linalg.norm(mean_pose - np.asarray(hand_mean).reshape(-1)))
+        if dist_mean < dist_zero:
+            raise ValueError(
+                f"{name}-hand finger poses in acc_ori.pkl seem to include the MANO hands_mean "
+                f"(|avg pose - hands_mean| = {dist_mean:.3f} < |avg pose| = {dist_zero:.3f}). "
+                "build_mano_aa(flat_hand=False) adds the mean again. Re-run "
+                "extract_hot3d_clips.py without --keep_hand_mean."
+            )
+
+
 def make_json(save_name="per_object", afford_map_method="frequency"):
     if afford_map_method not in {"frequency", "min_distance"}:
         raise ValueError(
@@ -499,6 +531,11 @@ def make_json(save_name="per_object", afford_map_method="frequency"):
 
     data_path = osp.join(data_root, f"acc_ori.pkl")
 
+    # Pose convention: acc_ori.pkl stores the 45-d finger pose of each hand WITHOUT the MANO mean
+    # pose (smplx `hand_pose`, the default of extract_hot3d_clips.py). These layers use
+    # flat_hand_mean=False, i.e. they add `hands_mean` to the finger pose once. A file written with
+    # extract_hot3d_clips.py --keep_hand_mean (Jun-8 variant, mean already included) would get the
+    # mean twice; check_hand_pose_convention() refuses such a file.
     lhand_layer = build_mano_aa(is_rhand=False, flat_hand=False)
     lhand_layer = lhand_layer.cuda()
     rhand_layer = build_mano_aa(is_rhand=True, flat_hand=False)
@@ -511,6 +548,11 @@ def make_json(save_name="per_object", afford_map_method="frequency"):
 
     with open(data_path, "rb") as f:
         data = pickle.load(f)
+    check_hand_pose_convention(
+        data,
+        lhand_layer.hand_mean.detach().cpu().numpy(),
+        rhand_layer.hand_mean.detach().cpu().numpy(),
+    )
     """
         hand_pose_manos -> 124 x 1 (entries 0 and 62 fixed to 1 as dummy values)
         obj_pose_rt_data -> 17 x 1 (1 -> object idx, 1: -> 4 x 4 matrix)
