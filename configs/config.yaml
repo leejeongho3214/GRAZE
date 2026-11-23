@@ -23,6 +23,8 @@ defaults:
 fold: obj0
 
 batch_size: 64
+# shuffle / balance_weights have no effect in graze/train.py: the training loader is built
+# with test=True (fixed order, no WeightedRandomSampler), as in the released model's training.
 shuffle: True
 drop_last: True
 num_workers: 4

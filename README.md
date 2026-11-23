@@ -96,14 +96,14 @@ Expected layout under `data/`:
 data/
 ├── mano/mano_v1_2/models/            MANO_LEFT.pkl, MANO_RIGHT.pkl
 └── hot3d/
-    ├── previous/                     HOT3D object models <id>.glb + instance.json
-    ├── object_mesh/                  <id>.ply  (HOT3D models as .ply) + instance.json
-    ├── pre-process/                  <id>.ply  (simplified HOT3D models, read by the data loader) + instance.json
+    ├── previous/                     HOT3D object models <id>.glb + instance.json (read by the loader)
+    ├── object_mesh/                  <id>.ply  (HOT3D models as .ply)
+    ├── pre-process/                  <id>.ply  (simplified HOT3D models, read by the data loader)
     ├── data/acc_ori.pkl              per-action hand / object / camera / gaze tracks extracted from HOT3D
     ├── pre-process_dataset/acc_ori.pkl   the same tracks, grouped by object
     └── dataset/
         ├── obj.pkl                   1,024-point clouds + normals (farthest point sampling)
-        ├── ori_dataset/gaze_{train,test}.pkl
+        ├── ori_dataset/gaze_{train,test}.pkl   intermediate, read only by build_threefold.py
         └── threefold/obj{0,1,2}_{train,test}.pkl, manifest.json
 ```
 
@@ -124,6 +124,10 @@ python preprocess/preprocessing_hot3d.py --step clips
 # 6. Pool both splits (915 clips) and write the 3-fold splits
 python preprocess/build_threefold.py
 ```
+
+Training, inference and evaluation read only `obj.pkl`, the `threefold/` files, the meshes and
+`previous/instance.json`; `data/acc_ori.pkl`, `pre-process_dataset/` and `ori_dataset/` are needed
+only to rebuild the splits.
 
 Fold `obj<k>` tests on the objects of fold k and trains on the other two folds
 (302 / 311 / 302 test clips, 613 / 604 / 613 training clips). The training loader skips
@@ -171,6 +175,10 @@ This command does the following:
 As in training, the gaze of the first 30% of each clip's valid frames is kept and the rest is
 zeroed. The output is `results/graze_obj0.pkl`.
 
+Runtime: one seed of fold obj0 (302 clips) took 52 min on one shared GPU, so the full
+10 seeds of one fold take about 5–9 h. To run fewer seeds, append
+`texthom.exp.num_test_seeds=<n>`.
+
 As in the paper, the model is also given the initial object pose, the clip length and the
 active hands. The active hands are read from the hand words of the prompt.
 
@@ -195,6 +203,9 @@ python scripts/make_table1.py \
   --csv obj0 results/graze_obj0.csv --csv obj1 results/graze_obj1.csv --csv obj2 results/graze_obj2.csv \
   --sim obj0 results/sim_obj0.csv  --sim obj1 results/sim_obj1.csv  --sim obj2 results/sim_obj2.csv
 ```
+
+The simulation step (Sim. / SimD) needs PyBullet (`pybullet==3.2.6`, in `requirements.txt`).
+Scoring one seed takes about 5 min (metrics) plus a few seconds (simulation).
 
 Each metric is computed per generated sample and then averaged. The row is the mean of the three folds.
 

@@ -20,3 +20,5 @@ scikit-learn==1.3.2
 wandb==0.23.1
 # simulation metric (Sim / SimD) only
 pybullet==3.2.6
+# optional, not needed by the default commands:
+#   openai CLIP (only with use_text_condition=true), open3d, rerun-sdk (visualization)
